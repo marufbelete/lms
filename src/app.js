@@ -6,19 +6,17 @@ const app = express();
 const api_route = require('./routes/index');
 const cors = require('cors');
 const responseTime=require('response-time');
-// const { cleanData } = require("./middleware/clean_data.middleware");
 const config = require("./config/config.prod");
 
 app.use(cors({
     origin: ['https://localhost:3000'],
     credentials: true
 }));
-//log response time
 
+//log response time
 app.use(responseTime((req, res, time) => {
   console.log(`${req.method} ${req.url} ${time}ms`);
 }))
-console.log(process.env.NODE_ENV);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

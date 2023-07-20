@@ -16,7 +16,7 @@ exports.addRole=async(req,res,next)=>{
           handleError(error.message,403)
         }
         const result = await insertRole(param);
-        return res.json(result);
+        return res.status(201).json(result);
       }
       catch(error){
        next(error)
@@ -52,7 +52,7 @@ exports.addRole=async(req,res,next)=>{
           handleError(error.message,403)
         }
         const result = await editRole(param,filter);
-        return res.json(result);
+        return res.status(201).json(result);
       }
       catch(error){
        next(error)
