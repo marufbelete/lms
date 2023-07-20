@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
+const { ROLE } = require("../constant/role");
 
 const Role = sequelize.define("role", {
   id: {
@@ -9,8 +10,8 @@ const Role = sequelize.define("role", {
     allowNull: false,
   },
   name: {
-    type: Sequelize.STRING,
-    allowNull: false,
+    type: Sequelize.ENUM(ROLE.ADMIN,ROLE.LECTURE,ROLE.STUDENT),
+    defaultValue: ROLE.STUDENT
   },
   
 });

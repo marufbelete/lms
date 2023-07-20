@@ -1,10 +1,6 @@
 const {Sequelize}=require('sequelize');
-let config;
-if (process.env.NODE_ENV === 'production') {
-  config = require('../config/config.prod');
-} else {
-  config = require('../config/config.dev');
-}
+const config = require('../config/config');;
+console.log(config.ACCESS_TOKEN_SECRET)
 const sequelize = new Sequelize(
   config.DB_NAME,
   config.DB_USER,

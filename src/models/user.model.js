@@ -27,12 +27,10 @@ const User = sequelize.define("user", {
     unique: true,
   },
   subscribed_to_newsletter: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false,
+    type: Sequelize.STRING,
   },
   avatar: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: true,
+    type: Sequelize.STRING,
   },
   password: {
     type: Sequelize.STRING,

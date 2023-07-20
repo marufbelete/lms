@@ -5,7 +5,10 @@
 'DEV_DB_NAME',
 'DB_DIALECT',
 'DB_PORT',
-'PORT'
+'PORT',
+'ACCESS_TOKEN_SECRET',
+'LONG_ACCESS_TOKEN_EXPIRY',
+'ACCESS_TOKEN_EXPIRES'
 ].forEach((name) => {
     if (!process.env[name]) {
       throw new Error(`Environment variable ${name} is missing`)
@@ -20,6 +23,15 @@
     PORT:process.env.PORT,
     DB_PORT:process.env.DB_PORT,
     DB_DIALECT:process.env.DB_DIALECT,
-
+    ACCESS_TOKEN_SECRET:process.env.ACCESS_TOKEN_SECRET,
+    LONG_ACCESS_TOKEN_EXPIRY:process.env.LONG_ACCESS_TOKEN_EXPIRY,
+    ACCESS_TOKEN_EXPIRES:process.env.ACCESS_TOKEN_EXPIRES
   }
+  if (process.env.NODE_ENV === 'production') {
+    config.DB_HOST=process.env.PROD_DB_HOST,
+    config.DB_USER=process.env.PROD_DB_USER,
+    config.DB_PASSWORD=process.env.PROD_DB_PASSWORD,
+    config.DB_NAME=process.env.PROD_DB_NAME
+  } 
+
   module.exports=config
