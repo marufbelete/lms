@@ -1,0 +1,17 @@
+const {Sequelize}=require('sequelize');
+let config;
+if (process.env.NODE_ENV === 'production') {
+  config = require('../config/config.prod');
+} else {
+  config = require('../config/config.dev');
+}
+const sequelize = new Sequelize(
+  config.DB_NAME,
+  config.DB_USER,
+  config.DB_PASSWORD, 
+{ 
+  host: config.DB_HOST,
+  dialect: config.DB_DIALECT
+});
+ 
+module.exports=sequelize;

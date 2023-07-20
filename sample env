@@ -1,0 +1,19 @@
+PORT=8000
+DB_PORT=5432
+DB_DIALECT='postgres'
+
+# development
+DEV_DB_HOST='localhost'
+DEV_DB_USER='postgres'
+DEV_DB_PASSWORD='12345'
+DEV_DB_NAME='lmsdev'
+
+# production
+PROD_DB_HOST='localhost'
+PROD_DB_USER='postgres'
+PROD_DB_PASSWORD='12345'
+PROD_DB_NAME='lmsprod'
+
+NODE_ENV="production"
+
+
