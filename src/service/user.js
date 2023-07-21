@@ -7,8 +7,19 @@ const insertUser=async(param)=>{
   const  result= await new_user.save()
   return result;
 }
+
 const editUser=async(param,filter)=>{
   const  result= await User.update(param,filter)
+  return result;
+}
+
+const fetchUser=async(filter)=>{
+  const  result= await User.findOne(filter)
+  return result;
+}
+
+const fetchUserByPk=async(user_id)=>{
+  const  result= await User.findByPk(user_id)
   return result;
 }
 
@@ -17,5 +28,7 @@ const editUser=async(param,filter)=>{
 
 module.exports={
 insertUser,
-editUser
+editUser,
+fetchUser,
+fetchUserByPk
 }

@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user.model");
 const bouncer = require("../helpers/bruteprotect");
 const { signupUserSchema, 
 loginUserSchema } = require("../validation/user.validation");
@@ -7,11 +6,10 @@ const { handleError } = require("../helpers/handleError");
 const { accountConfirmationEmail } = require("../constant/email");
 const { issueToken, isEmailExist, 
 hashPassword, isEmailVerified, isPasswordCorrect } = require("../helpers/user");
-const util = require('util');
 const config = require("../config/config");
 const Role = require("../models/role.model");
-const { editUser, insertUser } = require("../service/user");
-const asyncVerify = util.promisify(jwt.verify);
+const { editUser, insertUser, fetchUser } = require("../service/user");
+const { sendEmail } = require("../helpers/mail");
 
 exports.registerUser = async (req, res, next) => {
   try {
@@ -20,9 +18,8 @@ exports.registerUser = async (req, res, next) => {
       if(error){
           handleError(error.message,403)
         }
-    // const token = jwt.sign({ email: email }, config.ACCESS_TOKEN_SECRET);
-    // const mailOptions=accountConfirmationEmail(email,token)
-    // await sendEmail(mailOptions);
+    const token = jwt.sign({ email: email }, config.ACCESS_TOKEN_SECRET);
+    const mailOptions=accountConfirmationEmail(email,token)
     if (await isEmailExist(email)) {
       if (await isEmailVerified(email)) {
         handleError("User already exists with this email", 400);
@@ -37,30 +34,28 @@ exports.registerUser = async (req, res, next) => {
           password: hashedPassword,
         }
         await editUser(param,filter)
-        // await sendEmail(mailOptions);
+        sendEmail(mailOptions);
         return res.json({ success: true });
       }
     }
     const hashedPassword = await hashPassword(password);
-    console.log(hashedPassword)
     const user = await insertUser({
       first_name,
       last_name,
       email,
       username,
+      isLocalAuth:true,
       password: hashedPassword,
     });  
-    console.log('reah')
     const role = await Role.findByPk(role_id);
     await user.addRole(role);
-    // await sendEmail(mailOptions);
+    sendEmail(mailOptions);
     return res.status(201).json({ success: true });
   }
   catch (err) {
     next(err);
   }
 };
-
 
 // Login a user
 exports.loginUser = async (req, res, next) => {
@@ -73,16 +68,16 @@ exports.loginUser = async (req, res, next) => {
     const { email, password} = req.body;
     const user = await isEmailExist(email);
     if (user) {
-      // if (!user.isEmailConfirmed) {
-      //   const token = jwt.sign({ email: user.email }, 
-      //   config.ACCESS_TOKEN_SECRET);
-      //   const mailOptions=accountConfirmationEmail(email,token)
-      //   // await sendEmail(mailOptions);
-      //   handleError(
-      //     "It seems like you haven't verified your email yet. Please check your email for the confirmation link.",
-      //     400
-      //   );
-      // }
+      if (!user.isEmailConfirmed) {
+        const token = jwt.sign({ email: user.email }, 
+        config.ACCESS_TOKEN_SECRET);
+        const mailOptions=accountConfirmationEmail(email,token)
+        sendEmail(mailOptions);
+        handleError(
+          "It seems like you haven't verified your email yet. Please check your email for the confirmation link.",
+          400
+        );
+      }
       if (await isPasswordCorrect(password, user.password)) {
           const access_token = param?.rememberme
           ? await issueToken(
@@ -101,15 +96,9 @@ exports.loginUser = async (req, res, next) => {
           first_name: user.first_name,
           last_name: user.last_name,
           email: user.email,
+          access_token
         };
         bouncer.reset(req);
-        res.cookie('access_token',
-          access_token, {
-          path: "/",
-          httpOnly:true,
-          secure: true,
-        })
-      
         return res
           .status(200)
           .json({ auth: true, info});
@@ -123,8 +112,25 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-
-
+//confirm email
+exports.confirmEmail = async (req, res, next) => {
+  try {
+    const { verifyToken } = req.query;
+    const user = await isTokenValid(verifyToken,config.ACCESS_TOKEN_SECRET);
+    if (user) {
+      const filter={ where: { email: user.email } }
+      const userInfo = await fetchUser(filter);
+      userInfo.isEmailConfirmed = true;
+      await userInfo.save();
+      return res.json({
+        confirmed:true
+      });
+    }
+    handleError('erro user not exist',403)
+  } catch (err) {
+    next(err);
+  }
+};
 
 
 

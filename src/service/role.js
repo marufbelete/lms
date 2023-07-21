@@ -23,10 +23,16 @@ const editRole=async(param,filter)=>{
   return result;
   }
 
+const fetchRoleByPk=async(role_id)=>{
+  const result =  await Role.update(role_id)
+  return result;
+  }
+
 
 module.exports={
 insertRole,
 fetchRoles,
 fetchRolesById,
-editRole
+editRole,
+fetchRoleByPk
 }

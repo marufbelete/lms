@@ -4,8 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const isEmailExist = async (email) => {
   const user = await User.findOne({
-    where: { email: email },
-    include: ["roles"],
+    where: { email: email }
   });
   return user;
 };

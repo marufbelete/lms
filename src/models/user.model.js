@@ -23,7 +23,6 @@ const User = sequelize.define("user", {
   },
   username: {
     type: Sequelize.STRING,
-    allowNull: false,
     unique: true,
   },
   subscribed_to_newsletter: {
@@ -34,7 +33,18 @@ const User = sequelize.define("user", {
   },
   password: {
     type: Sequelize.STRING,
-  }
+  },
+  isEmailConfirmed: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+  },
+  googleId: {
+    type: Sequelize.STRING,
+  },
+  isLocalAuth: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 module.exports = User;

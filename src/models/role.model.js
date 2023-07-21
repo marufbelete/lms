@@ -11,7 +11,8 @@ const Role = sequelize.define("role", {
   },
   name: {
     type: Sequelize.ENUM(ROLE.ADMIN,ROLE.LECTURE,ROLE.STUDENT),
-    defaultValue: ROLE.STUDENT
+    unique: true,
+    defaultValue: ROLE.STUDENT,
   },
   
 });

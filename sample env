@@ -20,3 +20,16 @@ LONG_ACCESS_TOKEN_EXPIRY="30d"
 ACCESS_TOKEN_EXPIRES="1d"
 
 
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+
+MAIL_PORT=465
+EMAIL=''
+MAIL_HOST="smtp.gmail.com"
+MAIL_SERVICE="Gmail"
+MAIL_REDIRECT_URI='https://developers.google.com/oauthplayground'
+MAIL_REFRESH_TOKEN=''
+
+BASE_URL="http://localhost:7000/api"
+
+
