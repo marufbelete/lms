@@ -3,10 +3,10 @@ const { fetchUserByPk } = require("../service/user");
 
 exports.addRoleToUser = async (req, res, next) => {
   try {
-    const {role_id,user_id}= req.body
+    const {id:user_id}= req.params
+    const {role_id}= req.body
     const user=await fetchUserByPk(user_id)
     const existing_user_roles=await user.getRoles()
-    console.log(existing_user_roles)
       if(existing_user_roles.find(e=>e.id===role_id))
      {
       return res.json({
@@ -27,7 +27,8 @@ exports.addRoleToUser = async (req, res, next) => {
 };
 exports.deleteRoleFromUser  = async (req, res, next) => {
   try {
-    const {role_id,user_id}= req.body
+    const {id:user_id}= req.params
+    const {role_id}= req.body
     const user=await fetchUserByPk(user_id)
     const existing_user_roles=await user.getRoles()
       if(existing_user_roles.find(e=>e.id===role_id))

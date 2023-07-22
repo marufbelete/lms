@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "set NODE_ENV=development && nodemon src/app.js",
-    "deploy": "node src/app.js",
+    "start:dev": "set NODE_ENV=development && nodemon src/app.js",
+    "start": "set NODE_ENV=development && node src/app.js",
     "etest": "jest --detectOpenHandles --forceExit src/test/end_to_end"
   },
   "keywords": [
