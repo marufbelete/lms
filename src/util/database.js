@@ -6,7 +6,13 @@ const sequelize = new Sequelize(
   config.DB_PASSWORD, 
 { 
   host: config.DB_HOST,
-  dialect: config.DB_DIALECT
+  dialect: config.DB_DIALECT,
+  dialectOptions: {
+    ssl: {
+      require: true, 
+      rejectUnauthorized: false 
+    }
+  }
 });
  
 module.exports=sequelize;
