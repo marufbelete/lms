@@ -1,7 +1,6 @@
 const ROLE={
     ADMIN:'admin',
-    STUDENT:'student',
-    LECTURE:'lecture'
+    STUDENT:'student'
 }
 module.exports={
     ROLE

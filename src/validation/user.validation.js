@@ -7,7 +7,8 @@ const Joi = require('joi');
     username: Joi.string().required(),
     subscribed_to_newsletter: Joi.string(),
     avatar: Joi.string(),
-    password: Joi.required()
+    password: Joi.string().min(8).required(),
+    role_id: Joi.string()
 });
 
  const loginUserSchema = Joi.object({
@@ -15,8 +16,20 @@ const Joi = require('joi');
     password: Joi.required()
 
 });
+ const roleToUserSchema = Joi.object({
+    user_id: Joi.string().required(),
+    role_id: Joi.string().required()
+
+});
+ const courseToUserSchema = Joi.object({
+    user_id: Joi.string().required(),
+    course_id: Joi.string().required()
+
+});
 
 module.exports={
     signupUserSchema,
-    loginUserSchema
+    loginUserSchema,
+    roleToUserSchema,
+    courseToUserSchema
 }

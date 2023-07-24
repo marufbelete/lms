@@ -14,8 +14,8 @@ const isPasswordCorrect = async (incomingPassword, existingPassword) => {
   return isMatch;
 };
 
-const issueToken = async function (id,email, key,expirey) {
-  const token = jwt.sign({ sub: id, email,}, key, { expiresIn: expirey });
+const issueToken = async function (param, key,expirey={}) {
+  const token = jwt.sign(param, key, { ...expirey });
   return token;
 };
 

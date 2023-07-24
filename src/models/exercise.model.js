@@ -1,11 +1,15 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
 
-const Lesson = sequelize.define("lesson", {
+const Exercise = sequelize.define("exercise", {
   id: {
     type: Sequelize.UUID,
     defaultValue:Sequelize.UUIDV4,
     primaryKey: true,
+    allowNull: false,
+  },
+  title: {
+    type: Sequelize.STRING,
     allowNull: false,
   },
   description: {
@@ -14,4 +18,4 @@ const Lesson = sequelize.define("lesson", {
   
 });
 
-module.exports = Lesson;
+module.exports = Exercise;

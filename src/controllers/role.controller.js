@@ -3,11 +3,12 @@ const {
   editRole,
   fetchRoles,
   insertRole,
-  fetchRolesById
+  fetchRole,
+  removeRole
  } = require("../service/role");
-const {addRoleSchema,getByIdSchema, updateRoleSchema } =
+const { getByIdSchema } = require("../validation/common.validation");
+const {addRoleSchema, updateRoleSchema } =
  require("../validation/role.validation");
-
 exports.addRole=async(req,res,next)=>{
       try{
         const param= req.body;
@@ -36,17 +37,15 @@ exports.addRole=async(req,res,next)=>{
   exports.updateRole=async(req,res,next)=>{
       try{
         const {id}=req.params;
-        const {name}=req.body;
+        const param=req.body;
         const filter={
           where:{
           id
           }
         };
-        const param={
-          name
-        };
+       
         const {error}=updateRoleSchema.validate({
-          id,name
+          id,...param
         })
         if(error){
           handleError(error.message,403)
@@ -59,14 +58,37 @@ exports.addRole=async(req,res,next)=>{
       }
     }
 
-  exports.getRoleById=async(req,res,next)=>{
+  exports.getRole=async(req,res,next)=>{
       try{
         const {id}=req.params;
         const {error}=getByIdSchema.validate({id})
         if(error){
           handleError(error.message,403)
         }
-        const result = await fetchRolesById(id);
+        const filter={
+          where:{id}
+        };
+        const result = await fetchRole(filter);
+        return res.json(result);
+      }
+      catch(error){
+       next(error)
+      }
+    }
+
+  exports.deleteRole=async(req,res,next)=>{
+      try{
+        const {id}=req.params;
+        const {error}=getByIdSchema.validate({id})
+        if(error){
+          handleError(error.message,403)
+        }
+        const filter = {
+          where:{
+            id
+          }
+        }
+        const result = await removeRole(filter);
         return res.json(result);
       }
       catch(error){

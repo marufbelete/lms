@@ -1,17 +1,24 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
 
-const Lesson = sequelize.define("lesson", {
+const Step = sequelize.define("step", {
   id: {
     type: Sequelize.UUID,
     defaultValue:Sequelize.UUIDV4,
     primaryKey: true,
     allowNull: false,
   },
-  description: {
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  content: {
+    type: Sequelize.STRING,
+  },
+  type: {
     type: Sequelize.STRING,
   },
   
 });
 
-module.exports = Lesson;
+module.exports = Step;

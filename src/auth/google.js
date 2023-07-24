@@ -3,8 +3,8 @@ const { issueToken} = require("../helpers/user");
 const { Op } = require("sequelize");
 const passportGoogle = require("passport-google-oauth20");
 const config = require("../config/config");
-const Role = require("../models/role.model");
 const { ROLE } = require("../constant/role");
+const { fetchRole } = require("../service/role");
 const GoogleStrategy = passportGoogle.Strategy;
 
 exports.googlePassport = (passport) => {
@@ -22,6 +22,7 @@ exports.googlePassport = (passport) => {
             last_name: profile?._json?.family_name,
             email: profile?._json?.email,
             googleId: profile?._json?.sub,
+            isEmailConfirmed: profile?._json?.email_verified
           }; 
           const [user,created] = await User.findOrCreate({
             where: {
@@ -33,7 +34,7 @@ exports.googlePassport = (passport) => {
             defaults: userInfo,
           });
           if(created){
-            const role = await Role.findOne({
+            const role = await fetchRole({
               where:{
                 name:ROLE.STUDENT
               }
@@ -52,12 +53,12 @@ exports.googlePassport = (passport) => {
 exports.issueGoogleToken = async (req, res, next) => {
   try {
     const access_token = await issueToken(
-      req?.user[0]?.id,
-      req?.user[0]?.email,
+      { sub: req?.user[0]?.id, email:req?.user[0]?.email},
       config.ACCESS_TOKEN_SECRET,
-      config.ACCESS_TOKEN_EXPIRES
+      { expiresIn: config.ACCESS_TOKEN_EXPIRES}
     );
-    return res.redirect(`http://localhost:3000/login?auth=true&type=google&access_token=${access_token}`);
+    return res.redirect(`http://localhost:3000/login?auth=true&
+      type=google&access_token=${access_token}`);
   } catch (err) {
     next(err);
   }

@@ -1,5 +1,3 @@
-
-const { handleError } = require("../helpers/handleError");
 const User = require("../models/user.model");
 
 const insertUser=async(param)=>{
@@ -18,7 +16,7 @@ const fetchUser=async(filter)=>{
   return result;
 }
 
-const fetchUserByPk=async(user_id)=>{
+const fetchUserById=async(user_id)=>{
   const  result= await User.findByPk(user_id)
   return result;
 }
@@ -30,5 +28,5 @@ module.exports={
 insertUser,
 editUser,
 fetchUser,
-fetchUserByPk
+fetchUserById
 }

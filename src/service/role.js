@@ -1,5 +1,3 @@
-
-const { handleError } = require("../helpers/handleError");
 const Role = require("../models/role.model");
 
 const insertRole=async(param)=>{
@@ -13,8 +11,8 @@ const fetchRoles=async()=>{
   return result;
 }
 
-const fetchRolesById=async(id)=>{
-  const result =  await Role.findByPk(id)
+const fetchRole=async(filter)=>{
+  const result =  await Role.findOne(filter)
   return result;
 }
 
@@ -23,8 +21,8 @@ const editRole=async(param,filter)=>{
   return result;
   }
 
-const fetchRoleByPk=async(role_id)=>{
-  const result =  await Role.update(role_id)
+const removeRole=async(filter)=>{
+  const result =  await Role.destroy(filter)
   return result;
   }
 
@@ -32,7 +30,7 @@ const fetchRoleByPk=async(role_id)=>{
 module.exports={
 insertRole,
 fetchRoles,
-fetchRolesById,
+fetchRole,
 editRole,
-fetchRoleByPk
+removeRole
 }

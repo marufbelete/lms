@@ -4,9 +4,6 @@ const Joi = require('joi');
     name: Joi.string().required(),
 });
 
- const getByIdSchema = Joi.object({
-    id: Joi.string().required(),
-});
  const updateRoleSchema = Joi.object({
     id: Joi.any().required(),
     name: Joi.string().required()
@@ -14,6 +11,5 @@ const Joi = require('joi');
 
 module.exports={
     addRoleSchema,
-    getByIdSchema,
     updateRoleSchema
 }

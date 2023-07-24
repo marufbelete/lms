@@ -1,20 +1,22 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
-const { ROLE } = require("../constant/role");
 
-const Role = sequelize.define("role", {
+const Course = sequelize.define("course", {
   id: {
     type: Sequelize.UUID,
     defaultValue:Sequelize.UUIDV4,
     primaryKey: true,
     allowNull: false,
   },
-  name: {
-    type: Sequelize.ENUM(ROLE.ADMIN,ROLE.LECTURE,ROLE.STUDENT),
-    unique: true,
-    defaultValue: ROLE.STUDENT,
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
   },
+  description: {
+    type: Sequelize.STRING,
+  },
+ 
   
 });
 
-module.exports = Role;
+module.exports = Course;

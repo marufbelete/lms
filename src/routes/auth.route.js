@@ -1,5 +1,5 @@
 const express=require('express')
-const route=express.Router()
+const route=express.Router({ mergeParams: true })
 const passport = require("passport");
 const {registerUser,loginUser, confirmEmail}=require('../controllers/auth.controller')
 const {errorHandler}=require('../middleware/errohandling.middleware')

@@ -5,20 +5,22 @@ loginUserSchema } = require("../validation/user.validation");
 const { handleError } = require("../helpers/handleError");
 const { accountConfirmationEmail } = require("../constant/email");
 const { issueToken, isEmailExist, 
-hashPassword, isEmailVerified, isPasswordCorrect } = require("../helpers/user");
+hashPassword, isEmailVerified, isPasswordCorrect, isTokenValid } = require("../helpers/user");
 const config = require("../config/config");
-const Role = require("../models/role.model");
 const { editUser, insertUser, fetchUser } = require("../service/user");
 const { sendEmail } = require("../helpers/mail");
+const { fetchRole } = require("../service/role");
+const { ROLE } = require("../constant/role");
 
 exports.registerUser = async (req, res, next) => {
   try {
     const { first_name, last_name, email, username, password,role_id} = req.body;
-    const {error}=signupUserSchema.validate({ first_name, last_name, email, username, password})
+    const {error}=signupUserSchema.validate({ first_name, last_name, email,
+       username, password,role_id})
       if(error){
           handleError(error.message,403)
         }
-    const token = jwt.sign({ email: email }, config.ACCESS_TOKEN_SECRET);
+    const token = await issueToken({ email: email }, config.ACCESS_TOKEN_SECRET);
     const mailOptions=accountConfirmationEmail(email,token)
     if (await isEmailExist(email)) {
       if (await isEmailVerified(email)) {
@@ -47,7 +49,11 @@ exports.registerUser = async (req, res, next) => {
       isLocalAuth:true,
       password: hashedPassword,
     });  
-    const role = await Role.findByPk(role_id);
+    const role = role_id?await fetchRole({where:{id:role_id}}):
+    await fetchRole({
+      where:{
+        name:ROLE.STUDENT
+      }});
     await user.addRole(role);
     sendEmail(mailOptions);
     return res.status(201).json({ success: true });
@@ -79,24 +85,33 @@ exports.loginUser = async (req, res, next) => {
         );
       }
       if (await isPasswordCorrect(password, user.password)) {
-          const access_token = param?.rememberme
+        const access_token = param?.rememberme
           ? await issueToken(
-            user.id,
-            email,
+            { sub: user?.id, email:email},
             config.ACCESS_TOKEN_SECRET,
-            config.LONG_ACCESS_TOKEN_EXPIRY
-          )
+            { expiresIn: config.LONG_ACCESS_TOKEN_EXPIRY})
           : await issueToken(
-             user.id, 
-             email,
-             config.ACCESS_TOKEN_SECRET,
-             config.ACCESS_TOKEN_EXPIRES);
-
+            { sub: user?.id, email:email},
+            config.ACCESS_TOKEN_SECRET,
+            { expiresIn: config.ACCESS_TOKEN_EXPIRES})
+                   
+        const role_info=await user.getRoles({
+            joinTableAttributes:['isActive']
+        })
+        const structured_role_info = role_info.map(role => {
+          return {
+            id: role.id,
+            name: role.name,
+            isActive: role.user_role.isActive
+          };
+        });
         const info = {
           first_name: user.first_name,
           last_name: user.last_name,
           email: user.email,
-          access_token
+          role_info:structured_role_info,
+          access_token,
+          
         };
         bouncer.reset(req);
         return res
