@@ -7,12 +7,12 @@ const sequelize = new Sequelize(
 { 
   host: config.DB_HOST,
   dialect: config.DB_DIALECT,
-  // dialectOptions: {
-  //   ssl: {
-  //     require: true, 
-  //     rejectUnauthorized: false 
-  //   }
-  // }
+  dialectOptions: {
+    ssl: {
+      require: true, 
+      rejectUnauthorized: false 
+    }
+  }
 });
  
 module.exports=sequelize;
