@@ -5,7 +5,7 @@ const asyncVerify = util.promisify(jwt.verify);
 
 const authenticateJWT = async (req, res, next) => {
   try {
-    const token = req.cookies.access_token;
+    const token = req.cookies?.access_token;
     if (!token) {
       handleError("please login", 403);
     }

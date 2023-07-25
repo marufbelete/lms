@@ -23,7 +23,7 @@ exports.registerUser = async (req, res, next) => {
     const token = await issueToken({ email: email }, config.ACCESS_TOKEN_SECRET);
     const mailOptions=accountConfirmationEmail(email,token)
     if (await isEmailExist(email)) {
-      if (await isEmailVerified(email)) {
+      if (await isEmailVerified({email})) {
         handleError("User already exists with this email", 400);
       }
       else {
@@ -81,7 +81,7 @@ exports.loginUser = async (req, res, next) => {
         sendEmail(mailOptions);
         handleError(
           "It seems like you haven't verified your email yet. Please check your email for the confirmation link.",
-          400
+          403
         );
       }
       if (await isPasswordCorrect(password, user.password)) {

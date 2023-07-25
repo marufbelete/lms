@@ -35,8 +35,8 @@ const hashPassword = async (password) => {
   return hashed;
 };
 
-const isEmailVerified = async (email) => {
-  const user = await User.findOne({ where: { email: email } });
+const isEmailVerified = async (param) => {
+  const user = await User.findOne({ where: {...param} });
   return user?.isEmailConfirmed;
 };
 

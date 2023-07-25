@@ -1,5 +1,4 @@
 const { handleError } = require("../helpers/handleError");
-const Course_User = require("../models/course_user.model");
 const { fetchCourse } = require("../service/course");
 const { fetchRole } = require("../service/role");
 const { fetchUserById } = require("../service/user");
@@ -9,7 +8,6 @@ const { roleToUserSchema, courseToUserSchema } = require("../validation/user.val
 exports.addRoleToUser = async (req, res, next) => {
   try {
     const {id:user_id}= req.params
-  console.log(req.params)
     const {role_id}= req.body
     const {error}=roleToUserSchema.validate({
       user_id,role_id
@@ -17,6 +15,8 @@ exports.addRoleToUser = async (req, res, next) => {
     if(error){
       handleError(error.message,403)
     }
+  
+   
     const user=await fetchUserById(user_id)
     if(!user){
       handleError("user does not exist",403)
