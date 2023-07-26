@@ -11,6 +11,12 @@ const Joi = require('joi');
     role_id: Joi.string()
 });
 
+ const updateUserSchema = Joi.object({
+    first_name: Joi.string(),
+    last_name: Joi.string(),
+    avatar: Joi.string(),
+});
+
  const loginUserSchema = Joi.object({
     email: Joi.string().required().email(),
     password: Joi.required()
@@ -24,12 +30,21 @@ const Joi = require('joi');
  const courseToUserSchema = Joi.object({
     user_id: Joi.string().required(),
     course_id: Joi.string().required()
-
+});
+ const courseToLoggedUserSchema = Joi.object({
+    course_id: Joi.string().required()
+});
+ const changePasswordSchema = Joi.object({
+    old_password: Joi.string().required(),
+    new_password: Joi.string().required()
 });
 
 module.exports={
     signupUserSchema,
     loginUserSchema,
     roleToUserSchema,
-    courseToUserSchema
+    courseToUserSchema,
+    courseToLoggedUserSchema,
+    changePasswordSchema,
+    updateUserSchema
 }

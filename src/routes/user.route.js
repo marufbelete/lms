@@ -11,5 +11,4 @@ route.put('/course',registerUserForCourse,errorHandler)
 route.get('/course',getUserCoursesWithProgress,errorHandler)
 route.get('/course/:course_id',getUserCourseWithProgress,errorHandler)
 
-
 module.exports=route

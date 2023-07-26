@@ -15,6 +15,13 @@ const Exercise = sequelize.define("exercise", {
   description: {
     type: Sequelize.STRING,
   },
+  weight:{
+    type:Sequelize.INTEGER,
+    allowNull: false,
+  },
+  instruction:{
+    type: Sequelize.STRING,
+  }
   
 });
 

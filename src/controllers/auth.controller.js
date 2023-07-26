@@ -1,11 +1,12 @@
 const jwt = require("jsonwebtoken");
 const bouncer = require("../helpers/bruteprotect");
 const { signupUserSchema, 
-loginUserSchema } = require("../validation/user.validation");
+loginUserSchema, 
+changePasswordSchema} = require("../validation/user.validation");
 const { handleError } = require("../helpers/handleError");
 const { accountConfirmationEmail } = require("../constant/email");
 const { issueToken, isEmailExist, 
-hashPassword, isEmailVerified, isPasswordCorrect, isTokenValid } = require("../helpers/user");
+hashPassword, isEmailVerified, isPasswordCorrect, isTokenValid, getLoggedUser } = require("../helpers/user");
 const config = require("../config/config");
 const { editUser, insertUser, fetchUser } = require("../service/user");
 const { sendEmail } = require("../helpers/mail");
@@ -148,7 +149,38 @@ exports.confirmEmail = async (req, res, next) => {
   }
 };
 
-
+exports.changePassword = async (req, res, next) => {
+  try {
+    const param=req.body
+    const {error}=changePasswordSchema.validate(param)
+      if(error){
+          handleError(error.message,403)
+        }
+    const user=await getLoggedUser(req)
+    if(!user){
+      handleError("please login!",403)
+    }
+    if(!user.isLocalAuth){
+      handleError("This account uses google authentication.", 403);
+    }
+    const { old_password, new_password } = req.body;
+    if (await isPasswordCorrect(old_password, user.password)) {
+      const hashedPassword = await hashPassword(new_password);
+      await editUser(
+        { password: hashedPassword },
+        { where: { id: id } }
+      );
+      bouncer.reset(req);
+      return res.json({
+        message:"password successfully changed",
+        success:true,
+      });
+    }
+    handleError("old password not correct", 403);
+  } catch (err) {
+    next(err);
+  }
+};
 
 
 

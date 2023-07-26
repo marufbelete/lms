@@ -1,9 +1,10 @@
 const { handleError } = require("../helpers/handleError");
 const { fetchCourse } = require("../service/course");
+const { getCoursesWithProgress } = require("../service/exercise");
 const { fetchRole } = require("../service/role");
 const { fetchUserById } = require("../service/user");
 const { getByIdSchema } = require("../validation/common.validation");
-const { roleToUserSchema, courseToUserSchema } = require("../validation/user.validation");
+const { roleToUserSchema, courseToUserSchema} = require("../validation/user.validation");
 
 exports.addRoleToUser = async (req, res, next) => {
   try {
@@ -15,8 +16,7 @@ exports.addRoleToUser = async (req, res, next) => {
     if(error){
       handleError(error.message,403)
     }
-  
-   
+    
     const user=await fetchUserById(user_id)
     if(!user){
       handleError("user does not exist",403)
@@ -120,18 +120,20 @@ exports.getUserCoursesWithProgress = async (req, res, next) => {
     if(!user){
       handleError("user does not exist",403)
     }
-    const user_courses=await user.getCourses({
-      joinTableAttributes:['id','progress']
-    })
+    // const user_courses=await user.getCourses({
+    //   joinTableAttributes:['id','progress']
+    // })
+    const user_courses=await getCoursesWithProgress(id)
 
      return res.json({
-         user_courses
+      user_courses
      })
 
   } catch (err) {
     next(err);
   }
 };
+
 
 exports.getUserCourseWithProgress = async (req, res, next) => {
   try {
@@ -160,9 +162,3 @@ exports.getUserCourseWithProgress = async (req, res, next) => {
     next(err);
   }
 };
-
-
-
-
-
-

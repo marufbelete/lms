@@ -40,6 +40,12 @@ const isEmailVerified = async (param) => {
   return user?.isEmailConfirmed;
 };
 
+const getLoggedUser = async (req) => {
+  const id=req?.user?.sub
+  const user = await User.findByPk(id);
+  return user;
+};
+
 const userIp = (request) => {
   let ip = request.headers["x-forwarded-for"] || request.socket.remoteAddress;
   return ip;
@@ -55,4 +61,5 @@ module.exports = {
   hashPassword,
   userIp,
   isTokenValid,
+  getLoggedUser
 };

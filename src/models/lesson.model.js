@@ -11,6 +11,10 @@ const Lesson = sequelize.define("lesson", {
   description: {
     type: Sequelize.STRING,
   },
+  weight:{
+    type:Sequelize.INTEGER,
+    allowNull: false,
+  }
   
 });
 
