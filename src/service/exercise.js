@@ -1,5 +1,4 @@
 
-const { calculateProgress } = require("../helpers/common");
 const Course = require("../models/course.model");
 const Course_User = require("../models/course_user.model");
 const Exercise = require("../models/exercise.model");
@@ -54,7 +53,7 @@ const getCoursesWithProgress = async (userId) => {
       include: [
         {
           model: Course,
-          attributes: ['name'],
+          attributes: ['title'],
         },
         {
           model: Lesson_User,

@@ -8,9 +8,6 @@ const Course_User = sequelize.define("course_user", {
     primaryKey: true,
     allowNull: false,
   },
- 
-  
-
 
 });
 

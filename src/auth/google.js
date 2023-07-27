@@ -21,13 +21,13 @@ exports.googlePassport = (passport) => {
             first_name: profile?._json?.given_name,
             last_name: profile?._json?.family_name,
             email: profile?._json?.email,
-            googleId: profile?._json?.sub,
-            isEmailConfirmed: profile?._json?.email_verified
+            google_id: profile?._json?.sub,
+            is_email_confirmed: profile?._json?.email_verified
           }; 
           const [user,created] = await User.findOrCreate({
             where: {
               [Op.or]: [
-                { googleId: userInfo.googleId },
+                { google_id: userInfo.google_id },
                 { email: userInfo.email },
               ],
             },

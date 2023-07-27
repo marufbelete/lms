@@ -47,14 +47,19 @@ exports.registerUser = async (req, res, next) => {
       last_name,
       email,
       username,
-      isLocalAuth:true,
+      is_local_auth:true,
       password: hashedPassword,
     });  
-    const role = role_id?await fetchRole({where:{id:role_id}}):
-    await fetchRole({
+    let role=null
+    if(role_id){
+      role = await fetchRole({where:{id:role_id}})
+    }
+   if(!role){
+    role= await fetchRole({
       where:{
         name:ROLE.STUDENT
       }});
+   }
     await user.addRole(role);
     sendEmail(mailOptions);
     return res.status(201).json({ success: true });
@@ -75,7 +80,7 @@ exports.loginUser = async (req, res, next) => {
     const { email, password} = req.body;
     const user = await isEmailExist(email);
     if (user) {
-      if (!user.isEmailConfirmed) {
+      if (!user.is_email_confirmed) {
         const token = jwt.sign({ email: user.email }, 
         config.ACCESS_TOKEN_SECRET);
         const mailOptions=accountConfirmationEmail(email,token)
@@ -97,13 +102,13 @@ exports.loginUser = async (req, res, next) => {
             { expiresIn: config.ACCESS_TOKEN_EXPIRES})
                    
         const role_info=await user.getRoles({
-            joinTableAttributes:['isActive']
+            joinTableAttributes:['is_active']
         })
         const structured_role_info = role_info.map(role => {
           return {
             id: role.id,
             name: role.name,
-            isActive: role.user_role.isActive
+            is_active: role.user_role.is_active
           };
         });
         const info = {
@@ -137,7 +142,7 @@ exports.confirmEmail = async (req, res, next) => {
     if (user) {
       const filter={ where: { email: user.email } }
       const userInfo = await fetchUser(filter);
-      userInfo.isEmailConfirmed = true;
+      userInfo.is_email_confirmed = true;
       await userInfo.save();
       return res.json({
         confirmed:true
@@ -160,7 +165,7 @@ exports.changePassword = async (req, res, next) => {
     if(!user){
       handleError("please login!",403)
     }
-    if(!user.isLocalAuth){
+    if(!user.is_local_auth){
       handleError("This account uses google authentication.", 403);
     }
     const { old_password, new_password } = req.body;

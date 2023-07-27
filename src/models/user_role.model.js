@@ -8,7 +8,7 @@ const User_Role = sequelize.define("user_role", {
     primaryKey: true,
     allowNull: false,
   },
-  isActive: {
+  is_active: {
     type: Sequelize.BOOLEAN,
     defaultValue:true
   },

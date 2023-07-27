@@ -33,7 +33,7 @@ const Relation = () => {
   User.belongsToMany(Lesson,{
     through:Lesson_User
   });
-  Course.belongsToMany(User,{
+  Lesson.belongsToMany(User,{
     through:Lesson_User
   });
   User.hasMany(Lesson_User);

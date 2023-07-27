@@ -34,14 +34,14 @@ const User = sequelize.define("user", {
   password: {
     type: Sequelize.STRING,
   },
-  isEmailConfirmed: {
+  is_email_confirmed: {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
   },
-  googleId: {
+  google_id: {
     type: Sequelize.STRING,
   },
-  isLocalAuth: {
+  is_local_auth: {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
   },
