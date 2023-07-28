@@ -10,7 +10,7 @@ exports.addExercise=async(req,res,next)=>{
   try{
     const param= req.body;
     const {lesson_id}= req.params;
-    const {error}=await validateAddExerciseInput.validate({...param,lesson_id})
+    const {error}=await validateAddExerciseInput({...param,lesson_id})
     if(error){
       handleError(error.message,403)
     }
