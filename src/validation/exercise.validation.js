@@ -4,6 +4,7 @@ const { exerciseMaxWeightUpdateFilter, exerciseMaxWeightFilter } = require('../h
 
 const validateAddExerciseInput = async (input) => {
     const filter= exerciseMaxWeightFilter(input.lesson_id)
+    console.log(filter)
     const maxWeight = await getExerciseMaxWeightToAssign(filter,input.lesson_id);
  const addExerciseSchema = Joi.object({
     title: Joi.string().required(),

@@ -1,4 +1,4 @@
-const { Sequelize,Op } = require("sequelize");
+const { Op } = require("sequelize");
 const Course = require("../models/course.model");
 const Lesson = require("../models/lesson.model");
 
@@ -70,7 +70,7 @@ const exerciseMaxWeightUpdateFilter=(exercise_id,lesson_id)=> {
       }
     },
     include:{
-        model:Course,
+        model:Lesson,
         where:{
             id:lesson_id
         }
