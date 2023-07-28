@@ -1,8 +1,10 @@
 
+const { calculateCompletedExerciseWeight } = require("../helpers/common");
 const Course = require("../models/course.model");
 const Course_User = require("../models/course_user.model");
 const Exercise = require("../models/exercise.model");
 const Exercise_User = require("../models/exercise_user.model");
+const Lesson = require("../models/lesson.model");
 const Lesson_User = require("../models/lesson_user.model");
 const sequelize = require("../util/database");
 
@@ -44,35 +46,41 @@ const completeExercise=async(user_id,exercise_id)=>{
   return result;
   }
 
-const getCoursesWithProgress = async (userId) => {
-  const courseProgress = await Course_User.findAll({
-      attributes: [
-        [sequelize.fn('SUM', sequelize.col('Exercise.weight')), 'totalCourseWeight'],
-        [sequelize.fn('SUM', sequelize.literal('CASE WHEN "Exercises_Users"."is_completed" THEN "Exercise"."weight" ELSE 0 END')), 'courseProgress'],
-      ],
+const getCoursesWithProgress = async (filter) => {
+  const course_tracked = await Course_User.findAll({
+      ...filter,
       include: [
         {
           model: Course,
-          attributes: ['title'],
         },
         {
           model: Lesson_User,
-          where: { is_opened: true },
-          include: {
+          attributes: ['is_started',
+        ],
+          include: [
+            {
+              model: Lesson,
+              attributes: ['weight',
+            ],
+            },
+            {
             model: Exercise_User,
-            attributes: [],
+            attributes: ['is_completed'],
             include: {
               model: Exercise,
-              // attributes: ['weight'],
+              attributes: ['weight'],
             },
-          },
+          }
+        ],
         },
-      ],
-      where: { userId },
-      // group: ['courseId', 'Course.name'],
+      ]
+      
     });
-
-    return courseProgress;
+    const course_with_rogress=course_tracked.map(e=>{
+      e.course.dataValues.progress=calculateCompletedExerciseWeight(e)
+      return (e.course)
+    })
+    return course_with_rogress;
 };
 
 

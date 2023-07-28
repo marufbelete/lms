@@ -1,6 +1,6 @@
 
+const { WEIGHT } = require("../constant/common");
 const Lesson = require("../models/lesson.model");
-
 const insertLesson=async(param)=>{
   const new_Lesson = new Lesson(param)
   const  result= await new_Lesson.save()
@@ -26,11 +26,19 @@ const removeLesson=async(filter)=>{
   const result =  await Lesson.destroy(filter)
   return result;
   }
+
+const getLessonMaxWeightToAssign=async(filter)=>{
+  const result =  await Lesson.sum('weight',filter)
+  return WEIGHT.MAX-result;
+  }
+
+
   
 module.exports={
 insertLesson,
 fetchLessons,
 fetchLesson,
 editLesson,
-removeLesson
+removeLesson,
+getLessonMaxWeightToAssign
 }

@@ -3,7 +3,10 @@ const { getLoggedUser } = require("../helpers/user");
 const { fetchCourse } = require("../service/course");
 const { editUser } = require("../service/user");
 const { courseToLoggedUserSchema, updateUserSchema } = require("../validation/user.validation");
-
+const sequelize=require('../util/database');
+const Exercise = require("../models/exercise.model");
+const Lesson_User = require("../models/lesson_user.model");
+const { getCoursesWithProgress } = require("../service/exercise");
 
 exports.updateLoggedUserProfile = async (req, res, next) => {
   try {
@@ -35,6 +38,7 @@ exports.updateLoggedUserProfile = async (req, res, next) => {
 
 
 exports.registerLoggedUserForCourse = async (req, res, next) => {
+  const t=await sequelize.transaction()
   try {
     const {course_id}= req.body
     const {error}=courseToLoggedUserSchema.validate({
@@ -48,23 +52,43 @@ exports.registerLoggedUserForCourse = async (req, res, next) => {
       handleError("user not exist",403)
     }
     const existing_user_courses=await user.getCourses()
-      if(existing_user_courses.find(e=>e.id===course_id))
-     {
-      return res.json({
-      message:"This user already registerd for the course",
-      success:true
-      })
-     }
-     const course = await fetchCourse({where:{id:course_id}})
-     await user.addCourse(course,{through:{progress:0}})
-     return res.status(201).json({
-       success:true,
-       message:"You are registerd for the course successfully"
-     })
-    
-  } catch (err) {
-    next(err);
+    if(existing_user_courses.find(e=>e.id===course_id)){
+    handleError("This user already registerd for the course",403)
+   }
+   const course = await fetchCourse({where:{id:course_id},
+  include:[
+    {
+      model:Lesson,
+      include: [
+        {
+          model: Lesson_User,
+        },
+        {
+          model: Exercise,
+        },
+      ],
+    }
+  ]})
+   if(!course){
+    handleError("Course not exist",403)
+   }
+   const [course_user]=await user.addCourse(course,{ transaction: t })
+      const lesson_users=await user.addLessons(course?.lessons,
+    {through: { courseUserId: course_user.id },transaction: t })
+   for(let lesson of course?.lessons){
+    let lesson_user=lesson_users.find(e=>e.lessonId===lesson.id)
+    await user.addExercises(lesson?.exercises,
+    { through: { lessonUserId:lesson_user.id },transaction: t })
   }
+   await t.commit()
+   return res.status(201).json({
+     success:true,
+     message:"You are registerd for the course successfully"
+   })
+} catch (err) {
+  await t.rollback()
+  next(err);
+}
 };
 
 exports.getLoggedUserCoursesWithProgress = async (req, res, next) => {
@@ -73,13 +97,10 @@ exports.getLoggedUserCoursesWithProgress = async (req, res, next) => {
     if(!user){
       handleError("user not exist",403)
     }
-    const user_courses=await user.getCourses({
-      joinTableAttributes:['id','progress']
+    const user_courses=await getCoursesWithProgress({
+      where: { userId:user.id }
     })
-
-     return res.json({
-         user_courses
-     })
+     return res.json(user_courses)
 
   } catch (err) {
     next(err);
@@ -99,15 +120,10 @@ exports.getLoggedUserCourseWithProgress = async (req, res, next) => {
     if(!user){
       handleError("user not exist",403)
     }
-    const user_courses=await user.getCourses({
-      where:{
-        id:course_id
-      },
-      joinTableAttributes:['id','progress','createdAt','updatedAt']
+    const [user_course]=await getCoursesWithProgress({
+      where: { userId:user.id, courseId:course_id}
     })
-     return res.json({
-         user_courses
-     })
+     return res.json(user_course)
     
   } catch (err) {
     next(err);

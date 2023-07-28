@@ -1,5 +1,6 @@
 
 const Course = require("../models/course.model");
+const Course_User = require("../models/course_user.model");
 
 const insertCourse=async(param)=>{
   const new_course = new Course(param)
@@ -14,6 +15,11 @@ const fetchCourses=async(filter)=>{
 
 const fetchCourse=async(filter)=>{
   const result =  await Course.findOne(filter)
+  return result;
+}
+
+const fetchCourse_User=async(filter)=>{
+  const result =  await Course_User.findOne(filter)
   return result;
 }
 
@@ -32,5 +38,6 @@ insertCourse,
 fetchCourses,
 fetchCourse,
 editCourse,
-removeCourse
+removeCourse,
+fetchCourse_User
 }

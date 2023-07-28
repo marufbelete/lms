@@ -1,6 +1,6 @@
 const { insertLesson,fetchLessons,
 editLesson,fetchLesson, removeLesson } = require("../service/lesson");
-const { addLessonSchema,updateLessonSchema} = require("../validation/lesson.validation");
+const { addLessonSchema,updateLessonSchema, validateAddLessonInput, validateUpdateLessonInput} = require("../validation/lesson.validation");
 const { getByIdSchema } = require("../validation/common.validation");
 const { handleError } = require("../helpers/handleError");
 const { fetchCourse } = require("../service/course");
@@ -11,7 +11,7 @@ exports.addLesson=async(req,res,next)=>{
   try{
     const param= req.body;
     const {course_id} =req.params;
-    const {error}=addLessonSchema.validate({...param,course_id})
+    const {error}=await validateAddLessonInput({...param,course_id})
     if(error){
       handleError(error.message,403)
     }
@@ -61,15 +61,15 @@ exports.getLessons=async(req,res,next)=>{
 
 exports.updateLesson=async(req,res,next)=>{
   try{
-    const {lesson_id}=req.params;
+    const {lesson_id,course_id}=req.params;
     const param=req.body;
     const filter={
       where:{
       id:lesson_id
       }
     };
-    const {error}=updateLessonSchema.validate({
-      lesson_id,...param
+    const {error}=await validateUpdateLessonInput({
+      course_id,lesson_id,...param
     })
     if(error){
       handleError(error.message,403)
