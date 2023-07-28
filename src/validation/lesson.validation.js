@@ -20,8 +20,8 @@ const validateUpdateLessonInput = async (input) => {
     const updateLessonSchema = Joi.object({
         lesson_id: Joi.any().required(),
         description: Joi.string(),
-        course_id: Joi.string(),
-        weight: Joi.number().max(maxWeight).required(),
+        course_id: Joi.string().required(),
+        weight: Joi.number().max(maxWeight),
     });
     return updateLessonSchema.validateAsync(input);
   };

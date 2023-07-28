@@ -1,5 +1,6 @@
 const { Sequelize,Op } = require("sequelize");
 const Course = require("../models/course.model");
+const Lesson = require("../models/lesson.model");
 
 const calculateCompletedExerciseWeight=(data)=> {
     let totalWeight = 0;
@@ -14,6 +15,7 @@ const calculateCompletedExerciseWeight=(data)=> {
   
     return totalWeight;
   }
+
 const lessonMaxWeightFilter=(course_id)=> {
   const filter={
     include:{
@@ -27,6 +29,7 @@ const lessonMaxWeightFilter=(course_id)=> {
 }
     return filter;
   }
+  
 const lessonMaxWeightUpdateFilter=(course_id,lesson_id)=> {
   const filter={
     where:{
@@ -45,8 +48,42 @@ const lessonMaxWeightUpdateFilter=(course_id,lesson_id)=> {
     return filter;
   }
 
+const exerciseMaxWeightFilter=(lesson_id)=> {
+  const filter={
+    include:{
+        model:Lesson,
+        where:{
+            id:lesson_id
+        },
+      
+    },
+    group: ["lesson.id"]
+}
+    return filter;
+  }
+
+const exerciseMaxWeightUpdateFilter=(exercise_id,lesson_id)=> {
+  const filter={
+    where:{
+      id:{
+        [Op.ne]:exercise_id
+      }
+    },
+    include:{
+        model:Course,
+        where:{
+            id:lesson_id
+        }
+    },
+    group: ["lesson.id"]
+}
+    return filter;
+  }
+
   module.exports={
     calculateCompletedExerciseWeight,
     lessonMaxWeightFilter,
-    lessonMaxWeightUpdateFilter
+    lessonMaxWeightUpdateFilter,
+    exerciseMaxWeightFilter,
+    exerciseMaxWeightUpdateFilter
   }

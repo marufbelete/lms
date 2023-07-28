@@ -1,6 +1,6 @@
 const { insertExercise,fetchExercises,
 editExercise,fetchExercise, removeExercise } = require("../service/exercise");
-const { addExerciseSchema, updateExerciseSchema } = require("../validation/exercise.validation");
+const {validateUpdateExerciseInput, validateAddExerciseInput } = require("../validation/exercise.validation");
 const { getByIdSchema } = require("../validation/common.validation");
 const { handleError } = require("../helpers/handleError");
 const Lesson = require("../models/lesson.model");
@@ -10,7 +10,7 @@ exports.addExercise=async(req,res,next)=>{
   try{
     const param= req.body;
     const {lesson_id}= req.params;
-    const {error}=addExerciseSchema.validate({...param,lesson_id})
+    const {error}=await validateAddExerciseInput.validate({...param,lesson_id})
     if(error){
       handleError(error.message,403)
     }
@@ -54,10 +54,10 @@ exports.getExercises=async(req,res,next)=>{
 
 exports.updateExercise=async(req,res,next)=>{
   try{
-    const {exercise_id}=req.params;
+    const {exercise_id,lesson_id}=req.params;
     const param=req.body;
-    const {error}=updateExerciseSchema.validate({
-      id:exercise_id,...param
+    const {error}=await validateUpdateExerciseInput({
+      exercise_id,lesson_id,...param
     })
     if(error){
       handleError(error.message,403)

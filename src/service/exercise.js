@@ -7,6 +7,7 @@ const Exercise_User = require("../models/exercise_user.model");
 const Lesson = require("../models/lesson.model");
 const Lesson_User = require("../models/lesson_user.model");
 const sequelize = require("../util/database");
+const { fetchLesson } = require("./lesson");
 
 const insertExercise=async(param)=>{
   const new_Exercise = new Exercise(param)
@@ -83,6 +84,11 @@ const getCoursesWithProgress = async (filter) => {
     return course_with_rogress;
 };
 
+const getExerciseMaxWeightToAssign=async(filter,lesson_id)=>{
+  const lesson =  await fetchLesson({where:{id:lesson_id},attributes:['weight']})
+  const result =  await Exercise.sum('weight',filter)
+  return lesson.weight-result;
+  }
 
 module.exports={
 insertExercise,
@@ -91,5 +97,6 @@ fetchExercise,
 editExercise,
 removeExercise,
 completeExercise,
-getCoursesWithProgress
+getCoursesWithProgress,
+getExerciseMaxWeightToAssign
 }

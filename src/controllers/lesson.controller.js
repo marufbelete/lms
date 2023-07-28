@@ -1,6 +1,6 @@
 const { insertLesson,fetchLessons,
 editLesson,fetchLesson, removeLesson } = require("../service/lesson");
-const { addLessonSchema,updateLessonSchema, validateAddLessonInput, validateUpdateLessonInput} = require("../validation/lesson.validation");
+const {validateAddLessonInput, validateUpdateLessonInput} = require("../validation/lesson.validation");
 const { getByIdSchema } = require("../validation/common.validation");
 const { handleError } = require("../helpers/handleError");
 const { fetchCourse } = require("../service/course");
