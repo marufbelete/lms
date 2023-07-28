@@ -14,7 +14,7 @@ const Relation = require("./models/relation.model");
 const { googlePassport } = require("./auth/google");
 
 app.use(cors({
-    origin: ['https://localhost:3000'],
+    origin: ['http://localhost:3000'],
     credentials: true
 }));
 
