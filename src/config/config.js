@@ -17,7 +17,8 @@
 'MAIL_SERVICE',
 'MAIL_REDIRECT_URI',
 'MAIL_REFRESH_TOKEN',
-'BASE_URL'
+'BASE_URL',
+'FE_URL'
 ].forEach((name) => {
     if (!process.env[name]) {
       throw new Error(`Environment variable ${name} is missing`)
@@ -43,7 +44,8 @@
     MAIL_SERVICE:process.env.MAIL_SERVICE,
     MAIL_REDIRECT_URI:process.env.MAIL_REDIRECT_URI,
     MAIL_REFRESH_TOKEN:process.env.MAIL_REFRESH_TOKEN,
-    BASE_URL:process.env.BASE_URL
+    BASE_URL:process.env.BASE_URL,
+    FE_URL:process.env.FE_URL,
   }
   if (process.env.NODE_ENV === 'production') {
     config.DB_HOST=process.env.PROD_DB_HOST,

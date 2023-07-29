@@ -1,8 +1,8 @@
 const User = require("../models/user.model");
 
-const insertUser=async(param)=>{
+const insertUser=async(param,transaction={})=>{
   const new_user = new User(param)
-  const  result= await new_user.save()
+  const  result= await new_user.save({...transaction})
   return result;
 }
 

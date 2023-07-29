@@ -53,12 +53,13 @@ exports.googlePassport = (passport) => {
 exports.issueGoogleToken = async (req, res, next) => {
   try {
     const access_token = await issueToken(
-      { sub: req?.user[0]?.id, email:req?.user[0]?.email},
+      { sub: req?.user?.id, email:req?.user?.email},
       config.ACCESS_TOKEN_SECRET,
       { expiresIn: config.ACCESS_TOKEN_EXPIRES}
     );
-    return res.redirect(`http://localhost:3000/login?auth=true&
-      type=google&access_token=${access_token}`);
+    return res.redirect(`${config.FE_URL}/auth/google?auth=true&type=google
+      &first_name=${req?.user?.first_name}&last_name=${req?.user?.last_name}
+      &email=${req?.user?.email}&access_token=${access_token}`);
   } catch (err) {
     next(err);
   }

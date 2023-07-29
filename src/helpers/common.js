@@ -80,10 +80,30 @@ const exerciseMaxWeightUpdateFilter=(exercise_id,lesson_id)=> {
     return filter;
   }
 
+const getAuthInfo=(userInfo,role_info,access_token)=>{
+  const structured_role_info = role_info.map(role => {
+    return {
+      id: role.id,
+      name: role.name,
+      is_active: role.user_role.is_active
+    };
+  });
+  const info = {
+    id:userInfo.id,
+    first_name: userInfo.first_name,
+    last_name: userInfo.last_name,
+    email: userInfo.email,
+    role_info:structured_role_info,
+    access_token,
+  };
+  return info
+}
+
   module.exports={
     calculateCompletedExerciseWeight,
     lessonMaxWeightFilter,
     lessonMaxWeightUpdateFilter,
     exerciseMaxWeightFilter,
-    exerciseMaxWeightUpdateFilter
+    exerciseMaxWeightUpdateFilter,
+    getAuthInfo
   }

@@ -20,12 +20,7 @@ const issueToken = async function (param, key,expirey={}) {
 };
 
 const isTokenValid = async function (token,secret) {
-  const user = jwt.verify(token,secret, (err, user) => {
-    if (err) {
-      return null;
-    }
-    return user;
-  });
+  const user = jwt.verify(token,secret);
   return user;
 };
 
