@@ -1,8 +1,6 @@
 const express = require("express");
 require('dotenv').config()
-
-
-
+const cookieParser=require('cookie-parser')
 const sequelize = require("./util/database");
 const app = express();
 const api_route = require('./routes/index');
@@ -17,7 +15,7 @@ app.use(cors({
     origin: ['http://localhost:3000'],
     credentials: true
 }));
-
+app.use(cookieParser())
 //initialize passport
 app.use(passport.initialize());
 googlePassport(passport);

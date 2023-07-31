@@ -48,7 +48,7 @@ exports.registerUser = async (req, res, next) => {
           { sub: edited_user?.id, email:edited_user.email},
           config.ACCESS_TOKEN_SECRET,
           { expiresIn: config.ACCESS_TOKEN_EXPIRES})
-        const info=getAuthInfo(edited_user,role,access_token)
+        const info=getAuthInfo(edited_user,role)
         return res.json({ success: true,info });
       }
     }
@@ -72,12 +72,12 @@ exports.registerUser = async (req, res, next) => {
     await user.addRole(role,{transaction: t});
     sendEmail(mailOptions);
     //temp
-    const access_token = await issueToken(
-      { sub: user?.id, email:user.email},
-      config.ACCESS_TOKEN_SECRET,
-      { expiresIn: config.ACCESS_TOKEN_EXPIRES})
+    // const access_token = await issueToken(
+    //   { sub: user?.id, email:user.email},
+    //   config.ACCESS_TOKEN_SECRET,
+    //   { expiresIn: config.ACCESS_TOKEN_EXPIRES})
     const user_roles=await user.getRoles({ transaction: t });
-    const info=getAuthInfo(user,user_roles,access_token)
+    const info=getAuthInfo(user,user_roles)
     return res.status(201).json({ success: true,info });
     });
   }
@@ -120,11 +120,13 @@ exports.loginUser = async (req, res, next) => {
         const role_info=await user.getRoles({
             joinTableAttributes:['is_active']
         })
-        const info=getAuthInfo(user,role_info,access_token)
+        const info=getAuthInfo(user,role_info)
         bouncer.reset(req);
-        return res
-          .status(200)
-          .json({ auth: true, info});
+        return res.status(200).cookie("access_token",access_token,{
+          sameSite:'none',
+          path:'/',
+          // secure:true
+        }).json({auth:true,info})
       }
       handleError("Username or Password Incorrect", 400);
     }
@@ -151,12 +153,15 @@ exports.confirmEmail = async (req, res, next) => {
     const role_info=await userInfo.getRoles({
         joinTableAttributes:['is_active']
     })
-    const info=getAuthInfo(userInfo,role_info,access_token)
+    const info=getAuthInfo(userInfo,role_info)
     await userInfo.save();
-    return res
-      .status(200)
-      .json({ auth: true, info});
+    return res.status(200).cookie("access_token",access_token,{
+      sameSite:'none',
+      path:'/',
+      // secure:true
+    }).json({auth:true,info})
   }
+  
     handleError('erro user not exist',403)
   } catch (err) {
     next(err);
