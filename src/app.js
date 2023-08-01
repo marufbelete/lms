@@ -17,6 +17,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(cookieParser())
+app.options('*', cors())
 
 //initialize passport
 app.use(passport.initialize());
