@@ -127,13 +127,23 @@ exports.loginUser = async (req, res, next) => {
           path:'/',
           secure:true,
           httpOnly:true
-        }).json({auth:true,info})
+        }).json({success: true,auth:true,info})
       }
       handleError("Username or Password Incorrect", 400);
     }
     handleError("Username or Password Incorrect", 400);
   } 
   catch (err) {
+    next(err);
+  }
+};
+
+exports.logoutUser = async (req, res, next) => {
+  try {
+    return res.status(200).clearCookie('access_token').json({
+      success: true
+    })
+  } catch (err) {
     next(err);
   }
 };
@@ -157,11 +167,11 @@ exports.confirmEmail = async (req, res, next) => {
     const info=getAuthInfo(userInfo,role_info,access_token)
     await userInfo.save();
     return res.status(200).cookie("access_token",access_token,{
-       // sameSite:'none',
+       sameSite:'none',
        path:'/',
-       // secure:true,
+       secure:true,
        httpOnly:true
-    }).json({auth:true,info})
+    }).json({success: true,auth:true,info})
   }
   
     handleError('erro user not exist',403)

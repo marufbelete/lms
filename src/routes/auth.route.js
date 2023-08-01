@@ -1,7 +1,8 @@
 const express=require('express')
 const route=express.Router({ mergeParams: true })
 const passport = require("passport");
-const {registerUser,loginUser, confirmEmail, changePassword}=require('../controllers/auth.controller')
+const {registerUser,loginUser, 
+confirmEmail, changePassword, logoutUser}=require('../controllers/auth.controller')
 const {errorHandler}=require('../middleware/errohandling.middleware')
 const bouncer = require("../helpers/bruteprotect");
 const { issueGoogleToken } = require('../auth/google');
@@ -35,6 +36,10 @@ route.use("/google/callback",
     issueGoogleToken,
     errorHandler
     );
+
+route.post('/logout',
+    logoutUser,
+    errorHandler)
 
 route.get('/confirm',
     confirmEmail,
