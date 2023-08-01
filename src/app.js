@@ -12,7 +12,8 @@ const Relation = require("./models/relation.model");
 const { googlePassport } = require("./auth/google");
 
 app.use(cors({
-    origin: ['http://localhost:3000','https://sorobanlearn.com'],
+    origin: ['http://localhost:3000','https://sorobanlearn.com',
+    'https://sorobanlearn-api-c47b0546b177.herokuapp.com'],
     credentials: true
 }));
 app.use(cookieParser())
