@@ -12,9 +12,11 @@ const Relation = require("./models/relation.model");
 const { googlePassport } = require("./auth/google");
 
 app.use(cors({
+    origin: '*',
     credentials: true
 }));
 app.use(cookieParser())
+
 //initialize passport
 app.use(passport.initialize());
 googlePassport(passport);
