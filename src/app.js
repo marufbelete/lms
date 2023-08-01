@@ -13,11 +13,10 @@ const { googlePassport } = require("./auth/google");
 
 app.use(cors({
     origin: ['http://localhost:3000','https://sorobanlearn.com',
-    'https://sorobanlearn-api-c47b0546b177.herokuapp.com'],
+    'https://7478-196-191-221-102.ngrok-free.app'],
     credentials: true
 }));
 app.use(cookieParser())
-app.options('*', cors())
 
 //initialize passport
 app.use(passport.initialize());
