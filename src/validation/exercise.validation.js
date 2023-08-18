@@ -19,12 +19,18 @@ const validateUpdateExerciseInput = async (input) => {
     const filter= exerciseMaxWeightUpdateFilter(input.exercise_id,input.lesson_id)
     const maxWeight = await getExerciseMaxWeightToAssign(filter,input.lesson_id);
     const updateExerciseSchema = Joi.object({
-        exercise_id: Joi.any().required(),
-        lesson_id: Joi.any().required(),
-        title: Joi.string(),
-        description: Joi.string(),
-        weight: Joi.number().max(maxWeight),
-        instruction: Joi.string(),
+      exercise_id: Joi.any().required(),
+      lesson_id: Joi.any().required(),
+      title: Joi.string(),
+      description: Joi.string(),
+      weight: Joi.number().max(maxWeight),
+      instruction: Joi.string(),
+      stepValidation: Joi.object({
+        type: Joi.string().required(),
+        input: Joi.string().required(),
+        error_message: Joi.string().required(),
+        success_message: Joi.string().required(),
+      }).optional(),
     });
  
     return updateExerciseSchema.validateAsync(input);

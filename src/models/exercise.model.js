@@ -4,7 +4,7 @@ const sequelize = require("../util/database");
 const Exercise = sequelize.define("exercise", {
   id: {
     type: Sequelize.UUID,
-    defaultValue:Sequelize.UUIDV4,
+    defaultValue: Sequelize.UUIDV4,
     primaryKey: true,
     allowNull: false,
   },
@@ -15,14 +15,17 @@ const Exercise = sequelize.define("exercise", {
   description: {
     type: Sequelize.STRING,
   },
-  weight:{
-    type:Sequelize.INTEGER,
+  weight: {
+    type: Sequelize.INTEGER,
     allowNull: false,
   },
-  instruction:{
+  instruction: {
     type: Sequelize.STRING,
-  }
-  
+  },
+  order: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+  },
 });
 
 module.exports = Exercise;
