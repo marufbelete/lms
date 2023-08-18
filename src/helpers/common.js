@@ -15,7 +15,7 @@ const calculateCompletedExerciseWeight=(data)=> {
   
     return totalWeight;
   }
-
+//also an use diretly the ourse_id in lesson in where and remove the inlude and grouping
 const lessonMaxWeightFilter=(course_id)=> {
   const filter={
     include:{
@@ -48,6 +48,7 @@ const lessonMaxWeightUpdateFilter=(course_id,lesson_id)=> {
     return filter;
   }
 
+//also an use diretly the lesson_id in exerise in where and remove the inlude and grouping
 const exerciseMaxWeightFilter=(lesson_id)=> {
   const filter={
     include:{
