@@ -63,13 +63,15 @@ exports.getExercises = async (req, res, next) => {
 
 exports.updateExercise = async (req, res, next) => {
   try {
-    const { exercise_id } = req.params;
+    const { exercise_id,lesson_id } = req.params;
     const param = req.body;
-
+    
     const { error } = await validateUpdateExerciseInput({
       exercise_id,
+      lesson_id,
       ...param,
     });
+   
     if (error) {
       handleError(error.message, 403);
     }

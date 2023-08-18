@@ -1,5 +1,6 @@
 
 const { calculateCompletedExerciseWeight } = require("../helpers/common");
+const { handleError } = require("../helpers/handleError");
 const Course = require("../models/course.model");
 const Course_User = require("../models/course_user.model");
 const Exercise = require("../models/exercise.model");
@@ -85,6 +86,9 @@ const getCoursesWithProgress = async (filter) => {
 
 const getExerciseMaxWeightToAssign=async(filter,lesson_id)=>{
   const lesson =  await fetchLesson({where:{id:lesson_id},attributes:['weight']})
+  if(!lesson){
+    handleError("lesson not found",404)
+  }
   const result =  await Exercise.sum('exercise.weight',filter)
   return lesson.weight-result;
   }
