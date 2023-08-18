@@ -6,6 +6,7 @@ const { handleError } = require("../helpers/handleError");
 const Lesson = require("../models/lesson.model");
 const { fetchLesson } = require("../service/lesson");
 const StepValidation = require("../models/step_validation.model");
+const Exercise = require("../models/exercise.model");
 
 exports.addExercise = async (req, res, next) => {
   try {
