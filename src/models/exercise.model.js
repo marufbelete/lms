@@ -28,4 +28,6 @@ const Exercise = sequelize.define("exercise", {
   },
 });
 
+Exercise.hasOne(StepValidation, { foreignKey: "exerciseId" });
+
 module.exports = Exercise;
