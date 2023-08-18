@@ -5,6 +5,7 @@ const { getByIdSchema } = require("../validation/common.validation");
 const { handleError } = require("../helpers/handleError");
 const Lesson = require("../models/lesson.model");
 const { fetchLesson } = require("../service/lesson");
+const StepValidation = require("../models/step_validation.model");
 
 exports.addExercise = async (req, res, next) => {
   try {
@@ -15,11 +16,10 @@ exports.addExercise = async (req, res, next) => {
       handleError(error.message, 403);
     }
 
-    // Extract StepValidation parameters (assuming they are sent in the request)
-    const stepValidationParam = req.body.stepValidation;
     const exercise = await insertExercise(param);
 
-    // Create associated StepValidation
+    // Check for StepValidation parameters and create if they exist in the request
+    const stepValidationParam = req.body.stepValidation;
     if (stepValidationParam) {
       const stepValidation = await StepValidation.create(stepValidationParam);
       await exercise.setStepValidation(stepValidation);
@@ -63,47 +63,42 @@ exports.getExercises = async (req, res, next) => {
 
 exports.updateExercise = async (req, res, next) => {
   try {
-    const { exercise_id, lesson_id } = req.params;
+    const { exercise_id } = req.params;
     const param = req.body;
-    const stepValidationParam = req.body.stepValidation; // extract StepValidation params from request
 
     const { error } = await validateUpdateExerciseInput({
       exercise_id,
-      lesson_id,
       ...param,
     });
     if (error) {
       handleError(error.message, 403);
     }
 
-    // Fetch the existing exercise to see if it has a StepValidation associated
+    // Fetch existing exercise with associated StepValidation if it exists
     const existingExercise = await Exercise.findOne({
-      where: {
-        id: exercise_id,
-      },
-      include: StepValidation, // Include the associated StepValidation if it exists
+      where: { id: exercise_id },
+      include: StepValidation,
     });
 
     if (!existingExercise) {
       handleError("Exercise not found", 404);
     }
 
-    // Handle StepValidation association
+    // Extract StepValidation parameters from the request and update/create as necessary
+    const stepValidationParam = req.body.stepValidation;
     if (stepValidationParam) {
       if (existingExercise.StepValidation) {
-        // If Exercise already has a StepValidation, update it
         await existingExercise.StepValidation.update(stepValidationParam);
       } else {
-        // If not, create a new StepValidation and associate
-        const stepValidation = await StepValidation.create(stepValidationParam);
-        await existingExercise.setStepValidation(stepValidation);
+        const newStepValidation = await StepValidation.create(
+          stepValidationParam
+        );
+        await existingExercise.setStepValidation(newStepValidation);
       }
     }
 
-    // Finally, update the exercise itself
-    const result = await existingExercise.update(param);
-
-    return res.status(200).json(result); // Updated resources typically return 200 OK with the resource
+    const updatedExercise = await existingExercise.update(param);
+    return res.status(200).json(updatedExercise);
   } catch (error) {
     next(error);
   }
@@ -119,7 +114,7 @@ exports.getExercise = async (req, res, next) => {
     }
     const filter = {
       where: { id: exercise_id },
-      include: [], // Array to hold included models
+      include: [{ model: StepValidation }], // Array to hold included models
     };
 
     if (lesson) {

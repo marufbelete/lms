@@ -1,6 +1,5 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database");
-const StepValidation = require("./step_validation.model");
 
 const Exercise = sequelize.define("exercise", {
   id: {
@@ -28,7 +27,5 @@ const Exercise = sequelize.define("exercise", {
     allowNull: true,
   },
 });
-
-Exercise.hasOne(StepValidation, { foreignKey: "exerciseId" });
 
 module.exports = Exercise;

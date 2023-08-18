@@ -15,7 +15,7 @@ const StepValidation = sequelize.define(
       type: Sequelize.UUID,
       allowNull: false,
       references: {
-        model: "exercise",
+        model: "exercises",
         key: "id",
       },
     },
@@ -24,7 +24,7 @@ const StepValidation = sequelize.define(
       allowNull: false,
     },
     input: {
-      type: Sequelize.STRING,
+      type: Sequelize.TEXT,
       allowNull: false,
     },
     error_message: {
