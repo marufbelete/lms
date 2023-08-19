@@ -66,7 +66,6 @@ exports.updateExercise = async (req, res, next) => {
   try {
     const { exercise_id,lesson_id } = req.params;
     const param = req.body;
-    
     const { error } = await validateUpdateExerciseInput({
       exercise_id,
       lesson_id,
@@ -90,19 +89,21 @@ exports.updateExercise = async (req, res, next) => {
     // Extract StepValidation parameters from the request and update/create as necessary
     const stepValidationParam = req.body.stepValidation;
     if (stepValidationParam) {
-      if (existingExercise.StepValidation) {
-        await existingExercise.StepValidation.update(stepValidationParam);
+      if (existingExercise.step_validation) {
+        await existingExercise.step_validation.update(stepValidationParam);
       } else {
-        const newStepValidation = await StepValidation.create(
-          stepValidationParam
+       await StepValidation.create(
+          {
+            ...stepValidationParam,
+            exerciseId:existingExercise.id
+          }
         );
-        await existingExercise.setStepValidation(newStepValidation);
       }
     }
-
     const updatedExercise = await existingExercise.update(param);
     return res.status(200).json(updatedExercise);
   } catch (error) {
+    console.log(error)
     next(error);
   }
 };
