@@ -84,6 +84,38 @@ const getCoursesWithProgress = async (filter) => {
     return course_with_rogress;
 };
 
+const getCoursesInfo = async (filter) => {
+  const course_info = await Course_User.findAll({
+      ...filter,
+      attributes: [],
+      include: [
+        {
+          model: Course,
+          attributes: ['id','title','description'],
+        },
+        {
+          model: Lesson_User,
+          attributes: ['is_started'],
+          include: [
+            {
+              model: Lesson,
+              attributes: ['id','title']
+            },
+            {
+              model: Exercise_User,
+              attributes: ['is_completed'],
+              include: {
+                model: Exercise,
+                attributes: ['id','title'],
+              }
+            }
+        ],
+        },
+      ]  
+    });
+    return course_info;
+};
+
 const getExerciseMaxWeightToAssign=async(filter,lesson_id)=>{
   const lesson =  await fetchLesson({where:{id:lesson_id},attributes:['weight']})
   if(!lesson){
@@ -101,5 +133,6 @@ editExercise,
 removeExercise,
 completeExercise,
 getCoursesWithProgress,
-getExerciseMaxWeightToAssign
+getExerciseMaxWeightToAssign,
+getCoursesInfo
 }

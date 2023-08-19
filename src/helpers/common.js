@@ -100,11 +100,50 @@ const getAuthInfo=(userInfo,role_info,access_token)=>{
   return info
 }
 
+const mapCourseUserInfo=(inputData)=>{
+const transformedData = inputData.map((course) => {
+  const completedLessons = course.lesson_users.reduce((total, lessonUser) => {
+    const completedExercises = lessonUser.exrecise_users.filter(exercise => exercise.dataValues.is_completed);
+    if (completedExercises.length === lessonUser.exrecise_users.length) {
+      return total + 1;
+    }
+    return total;
+  }, 0);
+  
+  const lessons = course.lesson_users.map((lessonUser) => {
+    const completedExercises = lessonUser.exrecise_users.filter(exercise => exercise.dataValues.is_completed);
+    const isComplete = completedExercises.length === lessonUser.exrecise_users.length;
+    return {
+      id: lessonUser.lesson.dataValues.id,
+      title: lessonUser.lesson.dataValues.title,
+      completed_exercises: completedExercises.length,
+      is_complete: isComplete,
+      exercises: lessonUser.exrecise_users.map((exerciseUser) => ({
+        id: exerciseUser.exercise.dataValues.id,
+        title: exerciseUser.exercise.dataValues.title,
+        completed: exerciseUser.dataValues.is_completed,
+      })),
+    };
+  });
+
+  return {
+    id: course.course.id,
+    title: course.course.title,
+    description: course.course.description,
+    completed_lessons: completedLessons,
+    lessons: lessons,
+  };
+});
+return transformedData;
+}
+
+
   module.exports={
     calculateCompletedExerciseWeight,
     lessonMaxWeightFilter,
     lessonMaxWeightUpdateFilter,
     exerciseMaxWeightFilter,
     exerciseMaxWeightUpdateFilter,
-    getAuthInfo
+    getAuthInfo,
+    mapCourseUserInfo
   }

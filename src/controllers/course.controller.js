@@ -4,6 +4,7 @@ const { addCourseSchema, updateCourseSchema } = require("../validation/course.va
 const { getByIdSchema } = require("../validation/common.validation");
 const { handleError } = require("../helpers/handleError");
 const Lesson = require("../models/lesson.model");
+const Exercise = require("../models/exercise.model");
 
 exports.addCourse=async(req,res,next)=>{
   try{
@@ -28,6 +29,27 @@ exports.getCourses=async(req,res,next)=>{
       filter.include={
         model:Lesson
       }
+    }
+    const result = await fetchCourses(filter);
+    return res.json(result);
+  }
+  catch(error){
+   next(error)
+  }
+}
+
+exports.getCoursesInfo=async(req,res,next)=>{
+  try{
+    const filter={
+      attributes:['id','title','description'],
+      include:[{
+        model:Lesson,
+        attributes:['id','title'],
+        include:{
+          model:Exercise,
+          attributes:['id','title'],
+        }
+      }]
     }
     const result = await fetchCourses(filter);
     return res.json(result);
@@ -75,6 +97,33 @@ exports.getCourse=async(req,res,next)=>{
       filter.include={
         model:Lesson
       }
+    }
+    const result = await fetchCourse(filter);
+    return res.json(result);
+  }
+  catch(error){
+   next(error)
+  }
+}
+
+exports.getCourseInfo=async(req,res,next)=>{
+  try{
+    const {id}=req.params;
+    const {error}=getByIdSchema.validate({id})
+    if(error){
+      handleError(error.message,403)
+    }
+    const filter={
+      where:{id},
+      attributes:['id','title','description'],
+      include:[{
+        model:Lesson,
+        attributes:['id','title'],
+        include:{
+          model:Exercise,
+          attributes:['id','title'],
+        }
+      }]
     }
     const result = await fetchCourse(filter);
     return res.json(result);

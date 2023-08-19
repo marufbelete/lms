@@ -6,7 +6,8 @@ const { courseToLoggedUserSchema, updateUserSchema } = require("../validation/us
 const sequelize=require('../util/database');
 const Exercise = require("../models/exercise.model");
 const Lesson_User = require("../models/lesson_user.model");
-const { getCoursesWithProgress } = require("../service/exercise");
+const { getCoursesWithProgress, getCoursesInfo } = require("../service/exercise");
+const { mapCourseUserInfo } = require("../helpers/common");
 
 exports.updateLoggedUserProfile = async (req, res, next) => {
   try {
@@ -107,6 +108,21 @@ exports.getLoggedUserCoursesWithProgress = async (req, res, next) => {
   }
 };
 
+exports.getUserCoursesInfo = async (req, res, next) => {
+  try {
+   const user=await getLoggedUser(req)
+    if(!user){
+      handleError("user does not exist",403)
+    }
+    const user_courses=await getCoursesInfo({where: { userId:user.id }})
+    return res.json(mapCourseUserInfo(user_courses))
+
+  } catch (err) {
+    console.log(err)
+    next(err);
+  }
+};
+
 exports.getLoggedUserCourseWithProgress = async (req, res, next) => {
   try {
     const {course_id}= req.params
@@ -130,7 +146,32 @@ exports.getLoggedUserCourseWithProgress = async (req, res, next) => {
   }
 };
 
+exports.getUserCourseInfo = async (req, res, next) => {
+  try {
+    const {course_id}= req.params
+    const {error}=courseToLoggedUserSchema.validate({
+      course_id
+    })
+    if(error){
+      handleError(error.message,403)
+    }
+    const user=await getLoggedUser(req)
+    if(!user){
+      handleError("user does not exist",403)
+    }
+    const user_courses=await getCoursesInfo({
+      where: { userId:user.id, courseId:course_id}
+    })
+    if(user_courses.length<1){
+      handleError("course not found")
+    }
+    const [user_course]=mapCourseUserInfo(user_courses)
+    return res.json(user_course)
 
+  } catch (err) {
+    next(err);
+  }
+};
 
 
 
