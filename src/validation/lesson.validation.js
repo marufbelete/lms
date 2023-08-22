@@ -9,6 +9,7 @@ const validateAddLessonInput = async (input) => {
     const addLessonSchema = Joi.object({
         description: Joi.string().required(),
         course_id: Joi.string().required(),
+        title: Joi.string().required(),
         weight: Joi.number().max(maxWeight).required(),
     });
     return addLessonSchema.validateAsync(input);
@@ -20,6 +21,7 @@ const validateUpdateLessonInput = async (input) => {
     const updateLessonSchema = Joi.object({
         lesson_id: Joi.any().required(),
         description: Joi.string(),
+        title: Joi.string(),
         course_id: Joi.string().required(),
         weight: Joi.number().max(maxWeight),
     });

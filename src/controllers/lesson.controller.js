@@ -6,8 +6,12 @@ const { handleError } = require("../helpers/handleError");
 const { fetchCourse } = require("../service/course");
 const Course = require("../models/course.model");
 const Exercise = require("../models/exercise.model");
+const Course_User = require("../models/course_user.model");
+const User = require("../models/user.model");
+const sequelize=require('../util/database');
 
 exports.addLesson=async(req,res,next)=>{
+  const t=await sequelize.transaction()
   try{
     const param= req.body;
     const {course_id} =req.params;
@@ -15,18 +19,30 @@ exports.addLesson=async(req,res,next)=>{
     if(error){
       handleError(error.message,403)
     }
-    const lesson = await insertLesson(param);
+    const lesson = await insertLesson(param,{transaction: t });
     const course=await fetchCourse({where:{id:course_id}})
     if(!course){
       handleError("course does not exist",403)
     }
-    await course.addLesson(lesson)
+    await course.addLesson(lesson,{transaction: t })
+
+    const course_takers=await Course_User.findAll(
+    {where:{courseId:course_id},include:{model:User}})
+    if(course_takers.length>0){
+      for(const course_taker of course_takers){
+        await course_taker.user.addLesson(lesson,
+          {through: { courseUserId: course_taker.id },transaction: t })
+      }
+    }
+
+    await t.commit()
     return res.status(201).json({
       success:true,
       message:"lesson added"
     });
   }
   catch(error){
+    await t.rollback()
    next(error)
   }
 }

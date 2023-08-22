@@ -1,9 +1,9 @@
 
 const { WEIGHT } = require("../constant/common");
 const Lesson = require("../models/lesson.model");
-const insertLesson=async(param)=>{
+const insertLesson=async(param,t={})=>{
   const new_Lesson = new Lesson(param)
-  const  result= await new_Lesson.save()
+  const  result= await new_Lesson.save(t)
   return result;
 }
 

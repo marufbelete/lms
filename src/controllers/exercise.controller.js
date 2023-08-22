@@ -7,8 +7,12 @@ const Lesson = require("../models/lesson.model");
 const { fetchLesson } = require("../service/lesson");
 const StepValidation = require("../models/step_validation.model");
 const Exercise = require("../models/exercise.model");
+const User = require("../models/user.model");
+const Lesson_User = require("../models/lesson_user.model");
+const sequelize=require('../util/database');
 
 exports.addExercise = async (req, res, next) => {
+  const t=await sequelize.transaction()
   try {
     const param = req.body;
     const { lesson_id } = req.params;
@@ -17,26 +21,37 @@ exports.addExercise = async (req, res, next) => {
       handleError(error.message, 403);
     }
 
-    const exercise = await insertExercise(param);
+    const exercise = await insertExercise(param,{transaction: t });
 
     // Check for StepValidation parameters and create if they exist in the request
     const stepValidationParam = req.body.stepValidation;
     if (stepValidationParam) {
-      const stepValidation = await StepValidation.create(stepValidationParam);
-      await exercise.setStepValidation(stepValidation);
+      const stepValidation = await StepValidation.create(stepValidationParam,{transaction: t });
+      await exercise.setStepValidation(stepValidation,{transaction: t });
     }
 
     const lesson = await fetchLesson({ where: { id: lesson_id } });
     if (!lesson) {
       handleError("lesson does not exist", 403);
     }
-    await lesson.addExercise(exercise);
+    await lesson.addExercise(exercise,{transaction: t });
 
+    const lesson_takers=await Lesson_User.findAll(
+      {where:{lessonId:lesson_id},include:{model:User}})
+      if(lesson_takers.length>0){
+        for(const lesson_taker of lesson_takers){
+          await lesson_taker.user.addExercise(exercise,
+            {through: { lessonUserId:lesson_taker.id  },transaction: t })
+        }
+      }
+    
+    await t.commit()
     return res.status(201).json({
       success: true,
       message: "exercise added",
     });
   } catch (error) {
+    await t.rollback()
     next(error);
   }
 };

@@ -9,9 +9,9 @@ const Lesson = require("../models/lesson.model");
 const Lesson_User = require("../models/lesson_user.model");
 const { fetchLesson } = require("./lesson");
 
-const insertExercise=async(param)=>{
+const insertExercise=async(param,t={})=>{
   const new_Exercise = new Exercise(param)
-  const  result= await new_Exercise.save()
+  const  result= await new_Exercise.save(t)
   return result;
 }
 

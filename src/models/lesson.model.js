@@ -8,6 +8,9 @@ const Lesson = sequelize.define("lesson", {
     primaryKey: true,
     allowNull: false,
   },
+  title: {
+    type: Sequelize.STRING,
+  },
   description: {
     type: Sequelize.STRING,
   },
