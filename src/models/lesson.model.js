@@ -18,6 +18,10 @@ const Lesson = sequelize.define("lesson", {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
+  order: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+  },
 });
 
 module.exports = Lesson;
