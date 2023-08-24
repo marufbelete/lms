@@ -78,7 +78,6 @@ const Relation = () => {
     foreignKey: "courseUserId",
   });
 
-  //course_user to lesson_user
   Lesson_User.hasMany(Exercise_User, {
     foreignKey: "lessonUserId",
   });
