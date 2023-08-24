@@ -8,6 +8,7 @@ const Exercise = require("../models/exercise.model");
 const Lesson_User = require("../models/lesson_user.model");
 const { getCoursesWithProgress, getCoursesInfo } = require("../service/exercise");
 const { mapCourseUserInfo } = require("../helpers/common");
+const Lesson = require("../models/lesson.model");
 
 exports.updateLoggedUserProfile = async (req, res, next) => {
   try {
