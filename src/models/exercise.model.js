@@ -26,6 +26,10 @@ const Exercise = sequelize.define("exercise", {
     type: Sequelize.INTEGER,
     allowNull: true,
   },
+  type: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
 });
 
 module.exports = Exercise;
