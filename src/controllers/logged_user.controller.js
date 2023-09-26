@@ -74,9 +74,21 @@ exports.registerLoggedUserForCourse = async (req, res, next) => {
    if(!course){
     handleError("Course not exist",403)
    }
-   const [course_user]=await user.addCourse(course,{ transaction: t })
-      const lesson_users=await user.addLessons(course?.lessons,
+
+   const leastOrderLesson = await Lesson.findOne({
+    where: { courseId: course_id },
+    order: [['order', 'ASC']],
+  });
+
+    const [course_user]=await user.addCourse(course,{through: { currentLessonId: leastOrderLesson.id }, transaction: t })
+    const lesson_users=await user.addLessons(course?.lessons,
     {through: { courseUserId: course_user.id },transaction: t })
+
+    await Lesson_User.update(
+      { is_started: true },
+      { where: { lessonId: leastOrderLesson.id, userId: user.id },transaction: t }
+    );
+
    for(let lesson of course?.lessons){
     let lesson_user=lesson_users.find(e=>e.lessonId===lesson.id)
     await user.addExercises(lesson?.exercises,
@@ -119,7 +131,6 @@ exports.getUserCoursesInfo = async (req, res, next) => {
     return res.json(mapCourseUserInfo(user_courses))
 
   } catch (err) {
-    console.log(err)
     next(err);
   }
 };
@@ -140,8 +151,10 @@ exports.getLoggedUserCourseWithProgress = async (req, res, next) => {
     const [user_course]=await getCoursesWithProgress({
       where: { userId:user.id, courseId:course_id}
     })
-     return res.json(user_course)
-    
+    if(!user_course){
+      handleError("course not found",404)
+    }
+    return res.json(user_course)
   } catch (err) {
     next(err);
   }

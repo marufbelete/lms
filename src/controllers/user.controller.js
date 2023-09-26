@@ -9,7 +9,7 @@ const { roleToUserSchema, courseToUserSchema} = require("../validation/user.vali
 const sequelize=require('../util/database');
 const Exercise = require("../models/exercise.model");
 const Lesson_User = require("../models/lesson_user.model");
-const Exercise_User = require("../models/exercise_user.model");
+// const Exercise_User = require("../models/exercise_user.model");
 const { mapCourseUserInfo } = require("../helpers/common");
 
 exports.addRoleToUser = async (req, res, next) => {
@@ -109,9 +109,19 @@ exports.registerUserForCourse = async (req, res, next) => {
      if(!course){
       handleError("Course not exist",403)
      }
-     const [course_user]=await user.addCourse(course,{ transaction: t })
-        const lesson_users=await user.addLessons(course?.lessons,
+      const [course_user]=await user.addCourse(course,{ transaction: t })
+      const lesson_users=await user.addLessons(course?.lessons,
       {through: { courseUserId: course_user.id },transaction: t })
+
+      const leastOrderLesson = await Lesson.min('order', {
+        where: { courseId: course_id },transaction: t
+      });
+
+      await Lesson_User.update(
+        { is_started: true },
+        { where: { lessonId: leastOrderLesson.id, userId: user_id },transaction: t }
+      );
+
      for(let lesson of course?.lessons){
       let lesson_user=lesson_users.find(e=>e.lessonId===lesson.id)
       await user.addExercises(lesson?.exercises,
@@ -168,7 +178,6 @@ exports.getUserCoursesInfo = async (req, res, next) => {
     return res.json(mapCourseUserInfo(user_courses))
 
   } catch (err) {
-    console.log(err)
     next(err);
   }
 };

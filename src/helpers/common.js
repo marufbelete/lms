@@ -11,10 +11,14 @@ const calculateCompletedExerciseWeight=(data)=> {
           }
         });
       });
-   
-  
     return totalWeight;
   }
+
+const isAllCompleted=(arr)=> {
+  const allCompleted = arr.every(exercise => exercise.is_completed === true);
+  return allCompleted
+  }
+  
 //also an use diretly the ourse_id in lesson in where and remove the inlude and grouping
 const lessonMaxWeightFilter=(course_id)=> {
   const filter={
@@ -145,5 +149,6 @@ return transformedData;
     exerciseMaxWeightFilter,
     exerciseMaxWeightUpdateFilter,
     getAuthInfo,
-    mapCourseUserInfo
+    mapCourseUserInfo,
+    isAllCompleted
   }

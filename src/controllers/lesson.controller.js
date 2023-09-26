@@ -77,15 +77,16 @@ exports.getLessons=async(req,res,next)=>{
 
 exports.updateLesson=async(req,res,next)=>{
   try{
-    const {lesson_id,course_id}=req.params;
+    const {lesson_id}=req.params;
     const param=req.body;
     const filter={
       where:{
       id:lesson_id
       }
     };
+    const lesson= await fetchLesson({where:{id:lesson_id}})
     const {error}=await validateUpdateLessonInput({
-      course_id,lesson_id,...param
+      course_id:lesson.courseId,lesson_id,...param
     })
     if(error){
       handleError(error.message,403)

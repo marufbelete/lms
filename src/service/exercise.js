@@ -25,8 +25,18 @@ const fetchExercise=async(filter)=>{
   return result;
 }
 
-const editExercise=async(param,filter)=>{
-  const result =  await Exercise.update(param,filter)
+const fetchExerciseUser=async(filter)=>{
+  const result =  await Exercise_User.findOne(filter)
+  return result;
+}
+
+const fetchExerciseUsers=async(filter)=>{
+  const result =  await Exercise_User.findAll(filter)
+  return result;
+}
+
+const editExercise=async(param,filter,t={})=>{
+  const result =  await Exercise.update(param,filter,...t)
   return result;
   }
 
@@ -35,13 +45,14 @@ const removeExercise=async(filter)=>{
   return result;
   }
 
-const completeExercise=async(user_id,exercise_id)=>{
+const completeExercise=async(user_id,exercise_id,t={})=>{
   const param={is_completed:true}
   const filter={
     where:{
       userId:user_id,
       exerciseId:exercise_id
-    }
+    },
+    ...t
   }
   const result =  await Exercise_User.update(param,filter)
   return result;
@@ -79,6 +90,7 @@ const getCoursesWithProgress = async (filter) => {
     });
     const course_with_rogress=course_tracked.map(e=>{
       e.course.dataValues.progress=calculateCompletedExerciseWeight(e)
+      e.course.dataValues.current_lesson_id=e.currentLessonId
       return (e.course)
     })
     return course_with_rogress;
@@ -134,5 +146,7 @@ removeExercise,
 completeExercise,
 getCoursesWithProgress,
 getExerciseMaxWeightToAssign,
-getCoursesInfo
+getCoursesInfo,
+fetchExerciseUser,
+fetchExerciseUsers
 }

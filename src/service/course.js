@@ -32,6 +32,7 @@ const removeCourse=async(filter)=>{
   const result =  await Course.destroy(filter)
   return result;
   }
+
   
 module.exports={
 insertCourse,

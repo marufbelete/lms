@@ -11,6 +11,10 @@ const Lesson_User = sequelize.define("lesson_user", {
   is_started:{
     type: Sequelize.BOOLEAN,
     defaultValue:false
+  },
+  is_completed:{
+    type: Sequelize.BOOLEAN,
+    defaultValue:false
   }
 
 });

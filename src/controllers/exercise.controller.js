@@ -1,15 +1,20 @@
 const { insertExercise,fetchExercises,
-editExercise,fetchExercise, removeExercise } = require("../service/exercise");
+editExercise,fetchExercise,
+removeExercise, completeExercise,
+fetchExerciseUser, fetchExerciseUsers } = require("../service/exercise");
 const {validateUpdateExerciseInput, validateAddExerciseInput } = require("../validation/exercise.validation");
 const { getByIdSchema } = require("../validation/common.validation");
 const { handleError } = require("../helpers/handleError");
 const Lesson = require("../models/lesson.model");
-const { fetchLesson } = require("../service/lesson");
+const { fetchLesson, getNextLeastOrderLesson } = require("../service/lesson");
 const StepValidation = require("../models/step_validation.model");
 const Exercise = require("../models/exercise.model");
 const User = require("../models/user.model");
 const Lesson_User = require("../models/lesson_user.model");
 const sequelize=require('../util/database');
+const { getLoggedUser } = require("../helpers/user");
+const { isAllCompleted } = require("../helpers/common");
+const Course_User = require("../models/course_user.model");
 
 exports.addExercise = async (req, res, next) => {
   const t=await sequelize.transaction()
@@ -76,14 +81,49 @@ exports.getExercises = async (req, res, next) => {
     next(error);
   }
 };
-
+exports.completeExercise = async (req, res, next) => {
+  try {
+    await sequelize.transaction(async (t)=>{
+    const{exercise_id}=req.params
+    const user=await getLoggedUser(req)
+    const exercise=await fetchExercise({
+      where:{id:exercise_id}
+    })
+  
+    if(!exercise){
+      handleError("exercise not found",404)
+    }
+    const lesson=await exercise?.getLesson()
+    const [lesson_user]=await lesson?.getLesson_users({where:{userId:user.id}})
+    await completeExercise(user.id,exercise_id,{transaction:t})
+    const exercise_user=await fetchExerciseUsers({
+      where:{lessonUserId:lesson_user.id},transaction:t
+    })
+   if(isAllCompleted(exercise_user)){
+    const next_lesson= await getNextLeastOrderLesson(lesson.courseId,lesson.order)
+    await Lesson_User.update({is_completed:false},
+      {where:{is_completed:false,is_started:true,
+      userId:user.id},transaction:t})
+    await Lesson_User.update({is_started:true},
+      {where:{lessonId:next_lesson.id,
+      userId:user.id},transaction:t})
+    await Course_User.update({currentLessonId:next_lesson.id},
+    {where:{courseId:lesson.courseId,userId:user.id},transaction:t})
+   }
+  })
+  return res.status(201).json({message:"exercise completed",status:true});
+  } catch (error) {
+    next(error);
+  }
+};
 exports.updateExercise = async (req, res, next) => {
   try {
-    const { exercise_id,lesson_id } = req.params;
+    const { exercise_id} = req.params;
     const param = req.body;
+    const exercise=await fetchExercise({where:{id:exercise_id}})
     const { error } = await validateUpdateExerciseInput({
       exercise_id,
-      lesson_id,
+      lesson_id:exercise.lessonId,
       ...param,
     });
    
@@ -118,7 +158,6 @@ exports.updateExercise = async (req, res, next) => {
     const updatedExercise = await existingExercise.update(param);
     return res.status(200).json(updatedExercise);
   } catch (error) {
-    console.log(error)
     next(error);
   }
 };

@@ -1,6 +1,8 @@
 
 const { WEIGHT } = require("../constant/common");
 const Lesson = require("../models/lesson.model");
+const { Op } = require("sequelize");
+const Lesson_User = require("../models/lesson_user.model");
 const insertLesson=async(param,t={})=>{
   const new_Lesson = new Lesson(param)
   const  result= await new_Lesson.save(t)
@@ -27,11 +29,28 @@ const removeLesson=async(filter)=>{
   return result;
   }
 
+const currentLesson=async(userId,courseId)=>{
+  const result =  await Lesson_User.findOne({
+    where:{userId,courseId,is_acompleted:false,is_started:true}
+  })
+  return result;
+  }
+
 const getLessonMaxWeightToAssign=async(filter)=>{
   const result =  await Lesson.sum('weight',filter)
   return WEIGHT.MAX-result;
   }
 
+const getNextLeastOrderLesson=async(course_id,order_value)=>{
+  const leastOrderLesson = await Lesson.findOne({
+  where: { 
+    courseId: course_id,
+    order: { [Op.gt]: order_value }
+  },
+  order: [['order', 'ASC']],
+});
+return leastOrderLesson
+  }
 
   
 module.exports={
@@ -40,5 +59,7 @@ fetchLessons,
 fetchLesson,
 editLesson,
 removeLesson,
-getLessonMaxWeightToAssign
+getLessonMaxWeightToAssign,
+currentLesson,
+getNextLeastOrderLesson
 }
