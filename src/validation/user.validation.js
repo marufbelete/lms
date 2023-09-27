@@ -31,6 +31,9 @@ const Joi = require('joi');
     user_id: Joi.string().required(),
     course_id: Joi.string().required()
 });
+ const lessonIdSchema = Joi.object({
+    lesson_id: Joi.string().required()
+});
  const courseToLoggedUserSchema = Joi.object({
     course_id: Joi.string().required()
 });
@@ -46,5 +49,6 @@ module.exports={
     courseToUserSchema,
     courseToLoggedUserSchema,
     changePasswordSchema,
-    updateUserSchema
+    updateUserSchema,
+    lessonIdSchema
 }

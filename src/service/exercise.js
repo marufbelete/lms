@@ -45,6 +45,7 @@ const removeExercise=async(filter)=>{
   return result;
   }
 
+
 const completeExercise=async(user_id,exercise_id,t={})=>{
   const param={is_completed:true}
   const filter={
@@ -99,7 +100,7 @@ const getCoursesWithProgress = async (filter) => {
 const getCoursesInfo = async (filter) => {
   const course_info = await Course_User.findAll({
       ...filter,
-      attributes: [],
+      attributes: ['currentLessonId'],
       include: [
         {
           model: Course,
@@ -125,6 +126,7 @@ const getCoursesInfo = async (filter) => {
         },
       ]  
     });
+    console.log(course_info)
     return course_info;
 };
 

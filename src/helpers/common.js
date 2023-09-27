@@ -18,6 +18,23 @@ const isAllCompleted=(arr)=> {
   const allCompleted = arr.every(exercise => exercise.is_completed === true);
   return allCompleted
   }
+
+const mapUserExerciseInfo=(exercise_info)=> {
+  const maped_data = exercise_info.map(item => {
+    return {
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      weight: item.weight,
+      instruction: item.instruction,
+      order: item.order,
+      is_completed: item.exrecise_users[0].is_completed,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
+    };
+  });
+  return maped_data
+  }
   
 //also an use diretly the ourse_id in lesson in where and remove the inlude and grouping
 const lessonMaxWeightFilter=(course_id)=> {
@@ -105,8 +122,8 @@ const getAuthInfo=(userInfo,role_info,access_token)=>{
 }
 
 const mapCourseUserInfo=(inputData)=>{
-const transformedData = inputData.map((course) => {
-  const completedLessons = course.lesson_users.reduce((total, lessonUser) => {
+const transformedData = inputData.map((data) => {
+  const completedLessons = data.lesson_users.reduce((total, lessonUser) => {
     const completedExercises = lessonUser.exrecise_users.filter(exercise => exercise.dataValues.is_completed);
     if (completedExercises.length === lessonUser.exrecise_users.length) {
       return total + 1;
@@ -114,7 +131,7 @@ const transformedData = inputData.map((course) => {
     return total;
   }, 0);
   
-  const lessons = course.lesson_users.map((lessonUser) => {
+  const lessons = data.lesson_users.map((lessonUser) => {
     const completedExercises = lessonUser.exrecise_users.filter(exercise => exercise.dataValues.is_completed);
     const isComplete = completedExercises.length === lessonUser.exrecise_users.length;
     return {
@@ -131,9 +148,10 @@ const transformedData = inputData.map((course) => {
   });
 
   return {
-    id: course.course.id,
-    title: course.course.title,
-    description: course.course.description,
+    id: data.course.id,
+    title: data.course.title,
+    description: data.course.description,
+    current_lesson_id:data.currentLessonId,
     completed_lessons: completedLessons,
     lessons: lessons,
   };
@@ -150,5 +168,6 @@ return transformedData;
     exerciseMaxWeightUpdateFilter,
     getAuthInfo,
     mapCourseUserInfo,
-    isAllCompleted
+    isAllCompleted,
+    mapUserExerciseInfo
   }

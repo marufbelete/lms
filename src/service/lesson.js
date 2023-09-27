@@ -29,12 +29,12 @@ const removeLesson=async(filter)=>{
   return result;
   }
 
-const currentLesson=async(userId,courseId)=>{
-  const result =  await Lesson_User.findOne({
-    where:{userId,courseId,is_acompleted:false,is_started:true}
-  })
+const fetchLessonUser=async(userId,lessonId)=>{
+  const result =   await Lesson_User.findOne({where:{lessonId,userId}})
   return result;
   }
+
+
 
 const getLessonMaxWeightToAssign=async(filter)=>{
   const result =  await Lesson.sum('weight',filter)
@@ -60,6 +60,6 @@ fetchLesson,
 editLesson,
 removeLesson,
 getLessonMaxWeightToAssign,
-currentLesson,
-getNextLeastOrderLesson
+getNextLeastOrderLesson,
+fetchLessonUser
 }

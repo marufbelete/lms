@@ -33,6 +33,12 @@ const removeCourse=async(filter)=>{
   return result;
   }
 
+const currentLesson=async(userId,courseId)=>{
+    const result =  await Course_User.findOne({
+      where:{userId,courseId}
+    })
+    return result;
+  }
   
 module.exports={
 insertCourse,
@@ -40,5 +46,6 @@ fetchCourses,
 fetchCourse,
 editCourse,
 removeCourse,
-fetchCourse_User
+fetchCourse_User,
+currentLesson
 }

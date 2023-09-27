@@ -2,13 +2,15 @@ const { handleError } = require("../helpers/handleError");
 const { getLoggedUser } = require("../helpers/user");
 const { fetchCourse } = require("../service/course");
 const { editUser } = require("../service/user");
-const { courseToLoggedUserSchema, updateUserSchema } = require("../validation/user.validation");
+const { courseToLoggedUserSchema, updateUserSchema, lessonIdSchema } = require("../validation/user.validation");
 const sequelize=require('../util/database');
 const Exercise = require("../models/exercise.model");
 const Lesson_User = require("../models/lesson_user.model");
-const { getCoursesWithProgress, getCoursesInfo } = require("../service/exercise");
-const { mapCourseUserInfo } = require("../helpers/common");
+const { getCoursesWithProgress, getCoursesInfo, fetchExercises } = require("../service/exercise");
+const { mapCourseUserInfo, mapUserExerciseInfo } = require("../helpers/common");
 const Lesson = require("../models/lesson.model");
+const Exercise_User = require("../models/exercise_user.model");
+const { fetchLessonUser } = require("../service/lesson");
 
 exports.updateLoggedUserProfile = async (req, res, next) => {
   try {
@@ -186,6 +188,38 @@ exports.getUserCourseInfo = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getUserExerciseInfo = async (req, res, next) => {
+  try {
+    const {lesson_id}= req.params
+    const {error}=lessonIdSchema.validate({
+      lesson_id
+    })
+    if(error){
+      handleError(error.message,403)
+    }
+    const user=await getLoggedUser(req)
+    if(!user){
+      handleError("user does not exist",403)
+    }
+    const lesson_user= await fetchLessonUser(user.id,lesson_id)
+    const exercises_info=await fetchExercises({
+      include:{
+        model:Exercise_User,
+        where:{
+          userId:user.id,
+          lessonUserId:lesson_user.id
+        }
+      }
+    })
+    const maped_data=mapUserExerciseInfo(exercises_info)
+    return res.status(200).json(maped_data)
+
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 
 

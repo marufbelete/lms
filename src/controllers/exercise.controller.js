@@ -101,14 +101,19 @@ exports.completeExercise = async (req, res, next) => {
     })
    if(isAllCompleted(exercise_user)){
     const next_lesson= await getNextLeastOrderLesson(lesson.courseId,lesson.order)
-    await Lesson_User.update({is_completed:false},
+    const course_user= await Course_User.findOne({
+      where:{courseId:lesson.courseId,userId:user.id}
+    })
+    await Lesson_User.update({is_completed:true},
       {where:{is_completed:false,is_started:true,
-      userId:user.id},transaction:t})
+      userId:user.id,courseUserId:course_user.id},transaction:t})
     await Lesson_User.update({is_started:true},
       {where:{lessonId:next_lesson.id,
       userId:user.id},transaction:t})
-    await Course_User.update({currentLessonId:next_lesson.id},
-    {where:{courseId:lesson.courseId,userId:user.id},transaction:t})
+      course_user.currentLessonId=next_lesson.id
+      await course_user.save({transaction:t})
+    // await Course_User.update({currentLessonId:next_lesson.id},
+    // {where:{courseId:lesson.courseId,userId:user.id},transaction:t})
    }
   })
   return res.status(201).json({message:"exercise completed",status:true});
