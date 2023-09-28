@@ -127,7 +127,7 @@ exports.completeExercise = async (req, res, next) => {
    }
    return step_validation.success_message
   })
-  return res.status(201).json({message:result,status:true});
+  return res.status(201).json({message:result,success:true});
   } catch (error) {
     next(error);
   }
