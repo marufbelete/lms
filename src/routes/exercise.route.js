@@ -11,7 +11,6 @@ const PATH={
 route.post(PATH.LESSON_EX,addExercise,errorHandler)
 route.get(PATH.LESSON_EX,getExercises,errorHandler)
 route.put(PATH.EXERCISE,updateExercise,errorHandler)
-route.put(`${PATH.EXERCISE}/complete`,authenticateJWT,completeExercise,errorHandler)
 route.get(PATH.EXERCISE,getExercise,errorHandler)
 route.delete(PATH.EXERCISE,deleteExercise,errorHandler)
 

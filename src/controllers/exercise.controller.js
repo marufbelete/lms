@@ -81,10 +81,13 @@ exports.getExercises = async (req, res, next) => {
     next(error);
   }
 };
+
 exports.completeExercise = async (req, res, next) => {
   try {
-    await sequelize.transaction(async (t)=>{
+    const result=await sequelize.transaction(async (t)=>{
     const{exercise_id}=req.params
+    const{type,input}=req.body
+
     const user=await getLoggedUser(req)
     const exercise=await fetchExercise({
       where:{id:exercise_id}
@@ -92,6 +95,15 @@ exports.completeExercise = async (req, res, next) => {
   
     if(!exercise){
       handleError("exercise not found",404)
+    }
+    const step_validation=await StepValidation.findOne(
+      {where:{exerciseId:exercise_id}})
+    if(!step_validation){
+        handleError('step validation not found',404)
+      }
+    if(String(step_validation.type).toLowerCase!==String(type).toLowerCase
+    ||String(step_validation.input).toLowerCase!==String(input).toLowerCase){
+        return step_validation.error_message
     }
     const lesson=await exercise?.getLesson()
     const [lesson_user]=await lesson?.getLesson_users({where:{userId:user.id}})
@@ -112,15 +124,15 @@ exports.completeExercise = async (req, res, next) => {
       userId:user.id},transaction:t})
       course_user.currentLessonId=next_lesson.id
       await course_user.save({transaction:t})
-    // await Course_User.update({currentLessonId:next_lesson.id},
-    // {where:{courseId:lesson.courseId,userId:user.id},transaction:t})
    }
+   return step_validation.success_message
   })
-  return res.status(201).json({message:"exercise completed",status:true});
+  return res.status(201).json({message:result,status:true});
   } catch (error) {
     next(error);
   }
 };
+
 exports.updateExercise = async (req, res, next) => {
   try {
     const { exercise_id} = req.params;
