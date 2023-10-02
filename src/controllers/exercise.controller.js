@@ -86,7 +86,7 @@ exports.completeExercise = async (req, res, next) => {
     const result=await sequelize.transaction(async (t)=>{
     const{exercise_id}=req.params
     const{type,input}=req.body
-    const { error } = await completeExerciseSchema({ ...req.body,...req.params });
+    const { error } = completeExerciseSchema.validate({ ...req.body,...req.params });
     if (error) {
       handleError(error.message, 403);
     }
