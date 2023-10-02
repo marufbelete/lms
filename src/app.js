@@ -32,7 +32,7 @@ app.use(express.static('public'));
 Relation()
 app.use('/api',api_route)
 
-sequelize.sync().then(async(result)=>{
+sequelize.sync().then(async()=>{
   app.listen(config.PORT || 7000,() => {
     console.log(`Server is running on port ${config.PORT}.`);
   })

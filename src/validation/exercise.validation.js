@@ -35,7 +35,15 @@ const validateUpdateExerciseInput = async (input) => {
  
     return updateExerciseSchema.validateAsync(input);
   };
+
+const completeExerciseSchema = Joi.object({
+  exercise_id: Joi.any().required(),
+  type: Joi.any().required(),
+  input: Joi.string().required()
+});
+
 module.exports={
     validateAddExerciseInput,
-    validateUpdateExerciseInput
+    validateUpdateExerciseInput,
+    completeExerciseSchema
 }

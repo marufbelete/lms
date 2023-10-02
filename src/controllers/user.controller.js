@@ -122,11 +122,12 @@ exports.registerUserForCourse = async (req, res, next) => {
         { where: { lessonId: leastOrderLesson.id, userId: user_id },transaction: t }
       );
 
-     for(let lesson of course?.lessons){
-      let lesson_user=lesson_users.find(e=>e.lessonId===lesson.id)
-      await user.addExercises(lesson?.exercises,
-      { through: { lessonUserId:lesson_user.id },transaction: t })
-    }
+      for(let lesson of course?.lessons||[]){
+        let lesson_user=lesson_users?.find(e=>e.lessonId===lesson.id)
+        await user.addExercises(lesson?.exercises,
+        { through: { lessonUserId:lesson_user?.id },transaction: t })
+      }
+    
      await t.commit()
      return res.status(201).json({
        success:true,

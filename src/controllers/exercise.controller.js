@@ -1,8 +1,7 @@
 const { insertExercise,fetchExercises,
-editExercise,fetchExercise,
-removeExercise, completeExercise,
-fetchExerciseUser, fetchExerciseUsers } = require("../service/exercise");
-const {validateUpdateExerciseInput, validateAddExerciseInput } = require("../validation/exercise.validation");
+fetchExercise,removeExercise, completeExercise,
+fetchExerciseUsers } = require("../service/exercise");
+const {validateUpdateExerciseInput, validateAddExerciseInput, completeExerciseSchema } = require("../validation/exercise.validation");
 const { getByIdSchema } = require("../validation/common.validation");
 const { handleError } = require("../helpers/handleError");
 const Lesson = require("../models/lesson.model");
@@ -87,7 +86,10 @@ exports.completeExercise = async (req, res, next) => {
     const result=await sequelize.transaction(async (t)=>{
     const{exercise_id}=req.params
     const{type,input}=req.body
-
+    const { error } = await completeExerciseSchema({ ...req.body,...req.params });
+    if (error) {
+      handleError(error.message, 403);
+    }
     const user=await getLoggedUser(req)
     const exercise=await fetchExercise({
       where:{id:exercise_id}
@@ -106,10 +108,10 @@ exports.completeExercise = async (req, res, next) => {
         return step_validation.error_message
     }
     const lesson=await exercise?.getLesson()
-    const [lesson_user]=await lesson?.getLesson_users({where:{userId:user.id}})
+    const [lesson_user]=await lesson?.getLesson_users({where:{userId:user.id}})||[]
     await completeExercise(user.id,exercise_id,{transaction:t})
     const exercise_user=await fetchExerciseUsers({
-      where:{lessonUserId:lesson_user.id},transaction:t
+      where:{lessonUserId:lesson_user?.id},transaction:t
     })
    if(isAllCompleted(exercise_user)){
     const next_lesson= await getNextLeastOrderLesson(lesson.courseId,lesson.order)

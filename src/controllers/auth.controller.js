@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const bouncer = require("../helpers/bruteprotect");
 const { signupUserSchema,
   loginUserSchema,
@@ -202,7 +201,7 @@ exports.changePassword = async (req, res, next) => {
       const hashedPassword = await hashPassword(new_password);
       await editUser(
         { password: hashedPassword },
-        { where: { id: id } }
+        { where: { id: user.id } }
       );
       bouncer.reset(req);
       return res.json({

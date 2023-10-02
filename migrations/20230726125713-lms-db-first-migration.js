@@ -1,5 +1,5 @@
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface) {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       // user
@@ -31,7 +31,7 @@ module.exports = {
     }
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     const transaction = await queryInterface.sequelize.transaction();
     try {
       // await queryInterface.removeConstraint('lesson_users', 'lesson_users_courseUserId_fk', { transaction });

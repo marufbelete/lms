@@ -1,9 +1,8 @@
 const express=require('express')
 const route=express.Router({ mergeParams: true })
 const {addExercise,getExercises,updateExercise,
-getExercise,deleteExercise, completeExercise}=require('../controllers/exercise.controller')
+getExercise,deleteExercise, }=require('../controllers/exercise.controller')
 const {errorHandler}=require('../middleware/errohandling.middleware')
-const { authenticateJWT } = require('../middleware/auth.middleware')
 const PATH={
     LESSON_EX:'/lesson/:lesson_id/exercise',
     EXERCISE:'/exercise/:exercise_id'

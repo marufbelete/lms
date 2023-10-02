@@ -28,7 +28,7 @@ exports.updateLoggedUserProfile = async (req, res, next) => {
       },
       returning:true
     }
-    user_info=await editUser(req.body,filter)
+    const user_info=await editUser(req.body,filter)
      return res.status(201).json({
        success:true,
        user_info,
@@ -91,7 +91,7 @@ exports.registerLoggedUserForCourse = async (req, res, next) => {
       { where: { lessonId: leastOrderLesson.id, userId: user.id },transaction: t }
     );
 
-   for(let lesson of course?.lessons){
+   for(let lesson of course?.lessons||[]){
     let lesson_user=lesson_users.find(e=>e.lessonId===lesson.id)
     await user.addExercises(lesson?.exercises,
     { through: { lessonUserId:lesson_user.id },transaction: t })
