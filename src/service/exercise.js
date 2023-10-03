@@ -59,6 +59,7 @@ const completeExercise=async(user_id,exercise_id,t={})=>{
   return result;
   }
 
+
 const getCoursesWithProgress = async (filter) => {
   const course_tracked = await Course_User.findAll({
       ...filter,

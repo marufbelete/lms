@@ -11,6 +11,7 @@ const { mapCourseUserInfo, mapUserExerciseInfo } = require("../helpers/common");
 const Lesson = require("../models/lesson.model");
 const Exercise_User = require("../models/exercise_user.model");
 const { fetchLessonUser } = require("../service/lesson");
+const StepValidation = require("../models/step_validation.model");
 
 exports.updateLoggedUserProfile = async (req, res, next) => {
   try {
@@ -204,14 +205,18 @@ exports.getUserExerciseInfo = async (req, res, next) => {
     }
     const lesson_user= await fetchLessonUser(user.id,lesson_id)
     const exercises_info=await fetchExercises({
-      include:{
+      include:[{
         model:Exercise_User,
         where:{
           userId:user.id,
           lessonUserId:lesson_user.id
         }
-      }
+      },{
+        model:StepValidation,
+        attributes:['type']
+      }]
     })
+    
     const maped_data=mapUserExerciseInfo(exercises_info)
     return res.status(200).json(maped_data)
 

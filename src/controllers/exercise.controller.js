@@ -68,11 +68,15 @@ exports.getExercises = async (req, res, next) => {
       where: {
         lessonId: lesson_id,
       },
+      include :[{
+        model: StepValidation,
+        attributes:['type']
+      }]
     };
     if (lesson) {
-      filter.include = {
-        model: Lesson,
-      };
+      filter.include.push({
+        model: Lesson 
+      });
     }
     const result = await fetchExercises(filter);
     return res.json(result);
@@ -98,8 +102,7 @@ exports.completeExercise = async (req, res, next) => {
     if(!exercise){
       handleError("exercise not found",404)
     }
-    const step_validation=await StepValidation.findOne(
-      {where:{exerciseId:exercise_id}})
+    const step_validation=await exercise.getStep_validation()
     if(!step_validation){
         handleError('step validation not found',404)
       }
@@ -191,7 +194,10 @@ exports.getExercise = async (req, res, next) => {
     }
     const filter = {
       where: { id: exercise_id },
-      include: [{ model: StepValidation }], // Array to hold included models
+      include :[{
+      model: StepValidation,
+      attributes:['type']
+      }]
     };
 
     if (lesson) {
@@ -199,12 +205,7 @@ exports.getExercise = async (req, res, next) => {
         model: Lesson,
       });
     }
-
-    // Include the StepValidation if exists
-    filter.include.push({
-      model: StepValidation,
-    });
-
+    
     const result = await fetchExercise(filter);
     return res.json(result);
   } catch (error) {

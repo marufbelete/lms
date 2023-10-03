@@ -29,6 +29,7 @@ const mapUserExerciseInfo=(exercise_info)=> {
       instruction: item.instruction,
       order: item.order,
       is_completed: item.exrecise_users[0].is_completed,
+      step_validation:item.step_validation,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt
     };
