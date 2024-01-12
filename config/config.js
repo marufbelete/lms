@@ -1,13 +1,14 @@
 
 require('dotenv').config()
-const db_config = require('../src/config/config')
+const DB_URL = process.env.NODE_ENV=='production'?
+process.env.DB_URL:process.env.DEV_DB_URL
 const config = {
   development: {
-    url: db_config.DATABASE_URL,
+    url: DB_URL,
     dialect: 'postgres'
   },
   production: {
-    url: db_config.DATABASE_URL,
+    url: DB_URL,
     dialect: 'postgres',
     dialectOptions: {
       ssl: {
@@ -18,4 +19,4 @@ const config = {
   },
 };
 
-module.exports = config;
+module.exports= config;
