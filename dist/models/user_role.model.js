@@ -39,14 +39,14 @@ __decorate([
     __metadata("design:type", Number)
 ], User_Role.prototype, "userId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => user_model_1.User),
-    __metadata("design:type", String)
-], User_Role.prototype, "user", void 0);
-__decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => role_model_1.Role),
     sequelize_typescript_1.Column,
     __metadata("design:type", String)
 ], User_Role.prototype, "roleId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => user_model_1.User),
+    __metadata("design:type", user_model_1.User)
+], User_Role.prototype, "user", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => role_model_1.Role),
     __metadata("design:type", role_model_1.Role)

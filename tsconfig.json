@@ -14,9 +14,9 @@
     "module": "CommonJS",
     // "strictNullChecks":true,
     "moduleResolution": "Node",
-    "typeRoots": [
-      "./typing-stubs",
-      "./node_modules/@types"
-  ]
+  //   "typeRoots": [
+  //     "./typing-stubs",
+  //     "./node_modules/@types"
+  // ]
   }
 }

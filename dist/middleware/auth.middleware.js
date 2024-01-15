@@ -8,29 +8,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const jwt = require("jsonwebtoken");
-const util = require('util');
-const { handleError } = require("../helpers/handleError");
-const asyncVerify = util.promisify(jwt.verify);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.authenticateJWT = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = __importDefault(require("../config/config"));
+const handleError_1 = require("../helpers/handleError");
 const authenticateJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        //   console.log(req.session.user)
-        // if (!req.session.user?.id) {
-        //   return res.status(401).json({ message: 'Unauthorized' });
-        // }
         const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.access_token;
         if (!token) {
-            handleError("please login", 403);
+            (0, handleError_1.handleError)("please login", 403);
         }
-        const user = yield asyncVerify(token, process.env.ACCESS_TOKEN_SECRET);
+        const user = jsonwebtoken_1.default.verify(token, config_1.default.ACCESS_TOKEN_SECRET);
         req.user = user;
         next();
         return;
     }
     catch (error) {
+        if (error.name === "JsonWebTokenError" ||
+            error.name === "TokenExpiredError") {
+            error.message = "Invalid token.";
+            error.statusCode = 401;
+        }
         next(error);
     }
 });
-module.exports = { authenticateJWT };
+exports.authenticateJWT = authenticateJWT;
 //# sourceMappingURL=auth.middleware.js.map

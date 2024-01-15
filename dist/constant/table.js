@@ -11,6 +11,9 @@ exports.TABLE = {
     LESSON_USER: 'lesson_users',
     EXERCISE: 'exercises',
     EXERCISE_USER: 'exercise_users',
-    SETP_VALIDATION: 'step_validations'
+    STEP_VALIDATION: 'step_validations',
+    COLLECTION: 'collections',
+    COLLECTION_USER: 'collection_users',
+    PREREQUISITE: 'prerequisites'
 };
 //# sourceMappingURL=table.js.map

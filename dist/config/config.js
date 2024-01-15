@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 [
-    'DEV_DB_URL',
-    'DB_URL',
+    'DEV_DATABASE_URL',
+    'DATABASE_URL',
     'PORT',
     'ACCESS_TOKEN_SECRET',
     'LONG_ACCESS_TOKEN_EXPIRY',
@@ -10,22 +10,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
     'GOOGLE_CLIENT_ID',
     'GOOGLE_CLIENT_SECRET',
     'MAIL_PORT',
-    'FROM_EMAIL',
-    'TO_EMAIL',
+    'EMAIL',
     'MAIL_HOST',
     'MAIL_SERVICE',
     'MAIL_REDIRECT_URI',
     'MAIL_REFRESH_TOKEN',
     'BASE_URL',
     'FE_URL',
-    'STRIPE_WEBHOOK_SECRET'
+    'SENDGRID_API_KEY',
+    'AWS_REGION',
+    'AWS_BUCKET_NAME',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_PROFILE_FOLDER',
 ].forEach((name) => {
     if (!process.env[name]) {
         throw new Error(`Environment variable ${name} is missing`);
     }
 });
 const config = {
-    DB_URL: process.env.DEV_DB_URL,
+    DB_URL: process.env.DEV_DATABASE_URL,
     PORT: Number(process.env.PORT),
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
     LONG_ACCESS_TOKEN_EXPIRY: process.env.LONG_ACCESS_TOKEN_EXPIRY,
@@ -41,17 +45,23 @@ const config = {
     MAIL_REFRESH_TOKEN: process.env.MAIL_REFRESH_TOKEN,
     BASE_URL: process.env.BASE_URL,
     FE_URL: process.env.FE_URL,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-    STRIPE_PRIVATE_KEY: process.env.STRIPE_PRIVATE_KEY,
     DB_NAME: process.env.DB_NAME,
     DB_PASSWORD: process.env.DB_PASSWORD,
     DB_USER: process.env.DB_USER,
     DB_DIALECT: process.env.DB_DIALECT,
     DB_HOST: process.env.DB_HOST,
     DB_PORT: Number(process.env.DB_PORT),
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    FORUM_API_KEY: process.env.FORUM_API_KEY,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_PROFILE_FOLDER: process.env.AWS_PROFILE_FOLDER,
+    AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
+    AWS_COURSE_FOLDER: process.env.AWS_COURSE_FOLDER
 };
 if (process.env.NODE_ENV === 'production') {
-    config.DB_URL = process.env.DB_URL;
+    config.DB_URL = process.env.DATABASE_URL;
 }
 exports.default = config;
 //# sourceMappingURL=config.js.map

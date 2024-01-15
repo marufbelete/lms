@@ -13,20 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const passport_1 = __importDefault(require("passport"));
-// Import all our strategies
-const user_1 = require("../service/user");
-const local_1 = require("./local");
+const index_service_1 = require("../service/index.service");
 const google_1 = require("./google");
 passport_1.default.serializeUser(function (user, done) {
     done(null, user.id);
 });
 passport_1.default.deserializeUser(function (id, done) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield (0, user_1.fetchUserById)(id);
+        const user = yield index_service_1.UserService.fetchUserById(id);
         return done(null, user);
     });
 });
-passport_1.default.use('local', local_1.loginStrategy);
 passport_1.default.use('google', google_1.googleStrategy);
 exports.default = passport_1.default;
 //# sourceMappingURL=passport.js.map

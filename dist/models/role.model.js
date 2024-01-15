@@ -46,7 +46,7 @@ __decorate([
                     try {
                         const existingRole = yield Role.findOne({ where: { name: value } });
                         if (existingRole) {
-                            throw new Error("Role name is already in use.");
+                            throw new Error("Role name is already in exist.");
                         }
                     }
                     catch (err) {
@@ -76,5 +76,6 @@ exports.Role = Role = __decorate([
         tableName: table_1.TABLE.ROLE,
         modelName: 'role'
     })
+    //may need for internal validation Interfae
 ], Role);
 //# sourceMappingURL=role.model.js.map

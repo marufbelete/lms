@@ -9,93 +9,89 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteRole = exports.getRole = exports.updateRole = exports.getRoles = exports.addRole = void 0;
 const handleError_1 = require("../helpers/handleError");
-const role_1 = require("../service/role");
+const index_service_1 = require("../service/index.service");
 const common_validation_1 = require("../validation/common.validation");
 const role_validation_1 = require("../validation/role.validation");
-const addRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const param = req.body;
-        const { error } = role_validation_1.addRoleSchema.validate(param);
-        if (error) {
-            (0, handleError_1.handleError)(error.message, 403);
-        }
-        const result = yield (0, role_1.insertRole)(param);
-        return res.status(201).json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.addRole = addRole;
-const getRoles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield (0, role_1.fetchRoles)();
-        return res.json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.getRoles = getRoles;
-const updateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const param = req.body;
-        const filter = {
-            where: {
-                id
+exports.default = {
+    addRole: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const param = req.body;
+            const { error } = role_validation_1.addRoleSchema.validate(param);
+            if (error) {
+                (0, handleError_1.handleError)(error.message, 403);
             }
-        };
-        const { error } = role_validation_1.updateRoleSchema.validate(Object.assign({ id }, param));
-        if (error) {
-            (0, handleError_1.handleError)(error.message, 403);
+            const result = yield index_service_1.RoleService.insertRole(param);
+            return res.status(201).json(result);
         }
-        const result = yield (0, role_1.editRole)(param, filter);
-        return res.status(201).json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.updateRole = updateRole;
-const getRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const { error } = common_validation_1.getByIdSchema.validate({ id });
-        if (error) {
-            (0, handleError_1.handleError)(error.message, 403);
+        catch (error) {
+            next(error);
         }
-        const filter = {
-            where: { id }
-        };
-        const result = yield (0, role_1.fetchRole)(filter);
-        return res.json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.getRole = getRole;
-const deleteRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const { error } = common_validation_1.getByIdSchema.validate({ id });
-        if (error) {
-            (0, handleError_1.handleError)(error.message, 403);
+    }),
+    getRoles: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const result = yield index_service_1.RoleService.fetchRoles();
+            return res.json(result);
         }
-        const filter = {
-            where: {
-                id
+        catch (error) {
+            next(error);
+        }
+    }),
+    updateRole: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { id } = req.params;
+            const param = req.body;
+            const filter = {
+                where: {
+                    id
+                }
+            };
+            const { error } = role_validation_1.updateRoleSchema.validate(Object.assign({ id }, param));
+            if (error) {
+                (0, handleError_1.handleError)(error.message, 403);
             }
-        };
-        const result = yield (0, role_1.removeRole)(filter);
-        return res.json(result);
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.deleteRole = deleteRole;
+            const result = yield index_service_1.RoleService.editRole(param, filter);
+            return res.status(201).json(result);
+        }
+        catch (error) {
+            next(error);
+        }
+    }),
+    getRole: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { id } = req.params;
+            const { error } = common_validation_1.getByIdSchema.validate({ id });
+            if (error) {
+                (0, handleError_1.handleError)(error.message, 403);
+            }
+            const filter = {
+                where: { id }
+            };
+            const result = yield index_service_1.RoleService.fetchRole(filter);
+            return res.json(result);
+        }
+        catch (error) {
+            next(error);
+        }
+    }),
+    deleteRole: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { id } = req.params;
+            const { error } = common_validation_1.getByIdSchema.validate({ id });
+            if (error) {
+                (0, handleError_1.handleError)(error.message, 403);
+            }
+            const filter = {
+                where: {
+                    id
+                }
+            };
+            const result = yield index_service_1.RoleService.removeRole(filter);
+            return res.json(result);
+        }
+        catch (error) {
+            next(error);
+        }
+    })
+};
 //# sourceMappingURL=role.controller.js.map
