@@ -11,12 +11,12 @@ import { Exercise } from "../models/exercise.model";
 import { Lesson } from "../models/lesson.model";
 import { getByIdSchema } from "../validation/common.validation";
 import { CourseCreationAttributes } from "../types/course.interface";
-import { IncludeOptions } from "sequelize";
+import { IncludeOptions, UpdateOptions} from "sequelize";
 
 export default{
   addCourse : async (req:Request<{},{},CourseCreationAttributes>, res:Response, next:NextFunction) => {
     try {
-      const result= await sequelize.transaction(async (t) => {
+      return await sequelize.transaction(async (t) => {
       const param = req.body;
       const { error } = addCourseSchema.validate(param);
       if (error) {
@@ -34,7 +34,7 @@ export default{
         const prerequisite_info=param.prerequisiteIds
         .map(id=>({requisiteId:result.id,prereqId:id}))
         await CourseService.insertBulkPrerequisite(prerequisite_info,{transaction:t})
-        result.reload({include:[{
+        await result.reload({include:[{
           model:Course,
           as:'prereq',
           through:{
@@ -43,9 +43,9 @@ export default{
           attributes:['id','title','description']
         }],transaction:t})}
       result.dataValues.cover_url=cover_url
-      return result 
+      return res.status(201).json(result);
     });
-    return res.status(201).json(result);
+    
     } catch (error) {
       next(error);
     }
@@ -67,11 +67,12 @@ export default{
       };
       if (lesson) {
         filter.order = [
-          [Lesson, "order", "ASC"],
-          [Lesson, "createdAt", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "order", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "createdAt", "ASC"],
         ];
         filter.include!.push({
           model: Lesson,
+          as: 'lessons'
         });
       }
       const result = await CourseService.fetchCourses(paginate(filter,{page:Number(page)||1,pageSize:Number(pageSize)||9}));
@@ -88,10 +89,10 @@ export default{
       const filter:IncludeOptions = {
         attributes: ["id", "title", "description","image"],
         order: [
-          [Lesson, "order", "ASC"],
-          [Lesson, "createdAt", "ASC"],
-          [Lesson, Exercise, "order", "ASC"],
-          [Lesson, Exercise, "createdAt", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "order", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "createdAt", "ASC"],
+          [{model:Lesson, as: 'lessons'}, {model:Exercise,as:'exercises'}, "order", "ASC"],
+          [{model:Lesson, as: 'lessons'}, {model:Exercise,as:'exercises'}, "createdAt", "ASC"],
         ],
         include: [
           {
@@ -123,22 +124,14 @@ export default{
   
    updateCourse : async (req:Request<{id:string},{},Partial<CourseCreationAttributes>>, res:Response, next:NextFunction) => {
     try {
-      const result= await sequelize.transaction(async (t) => {
+      return await sequelize.transaction(async (t) => {
       const { id } = req.params;
       const param = req.body;
-      const filter = {
+      const filter:UpdateOptions = {
         where: {
           id
         },
         transaction:t,
-        include:[{
-          model:Course,
-          as:'prereq',
-          through:{
-            attributes:[]
-          },
-          attributes:['id','title','description']
-        }],
         returning:true
       };
       const { error } = updateCourseSchema.validate({
@@ -151,7 +144,7 @@ export default{
       let cover_url
       const course= await CourseService.fetchCourse(filter)
       if(!course){
-        handleError("course not found",404)
+       return handleError("course not found",404)
       }
       let key=course.image
       if(req.file){
@@ -175,9 +168,9 @@ export default{
   
       await course.reload({transaction:t})
       course.dataValues.cover_url=cover_url
-      return course
+      return res.status(201).json(course);
     })
-      return res.status(201).json(result);
+      
     } catch (error) {
       next(error);
     }
@@ -205,8 +198,8 @@ export default{
       };
       if (lesson) {
         filter.order = [
-          [Lesson, "order", "ASC"],
-          [Lesson, "createdAt", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "order", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "createdAt", "ASC"],
         ];
         filter.include!.push({
           model: Lesson,
@@ -228,23 +221,23 @@ export default{
       if (error) {
         handleError(error.message, 403);
       }
-      const filter = {
+      const filter:IncludeOptions = {
         where: { id },
         attributes: ["id", "title", "description","image"],
         order: [
-          [Lesson, "order", "ASC"],
-          [Lesson, "createdAt", "ASC"],
-          [Lesson, Exercise, "order", "ASC"],
-          [Lesson, Exercise, "createdAt", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "order", "ASC"],
+          [{model:Lesson, as: 'lessons'}, "createdAt", "ASC"],
+          [{model:Lesson, as: 'lessons'}, {model:Exercise,as:'exercises'}, "order", "ASC"],
+          [{model:Lesson, as: 'lessons'}, {model:Exercise,as:'exercises'}, "createdAt", "ASC"],
         ],
         include: [
           {
             model: Lesson,
             attributes: ["id", "title"],
-            include: {
-              model: Exercise,
+            include: [{
+              model:Exercise,
               attributes: ["id", "title"],
-            },
+            }],
           },
           {
             model:Course,
@@ -257,6 +250,9 @@ export default{
         ],
       };
       const result = await CourseService.fetchCourse(filter);
+      if(!result){
+        return handleError("course not found",404)
+      }
       const [mapped_result] = await mapCourseImage([result]);
       return res.json(mapped_result);
     } catch (error) {
@@ -264,14 +260,14 @@ export default{
     }
   },
   
-   deleteCourse : async (req:Request, res:Response, next:NextFunction) => {
+  deleteCourse : async (req:Request, res:Response, next:NextFunction) => {
     try {
       const { id } = req.params;
       const { error } = getByIdSchema.validate({ id });
       if (error) {
         handleError(error.message, 403);
       }
-      const filter = {
+      const filter:IncludeOptions = {
         where: {
           id,
         },

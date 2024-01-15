@@ -69,7 +69,7 @@ export class Course extends Model<ICourse,CourseCreationAttributes> {
   course_users?: Course_User[];
 
   @HasMany(()=> Lesson)
-  lessons?: Lesson[];
+  lessons!: Lesson[];
 
   @BelongsToMany(() => Course, () => Prerequisite, 'requisiteId', 'prereqId')
   prereq?: Course[];

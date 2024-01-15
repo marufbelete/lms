@@ -1,5 +1,11 @@
 export interface IError extends Error {
   status: number;
+//   errors?:{
+//       message: string,
+//       type: string,
+//       path: string,
+  
+// }[]
 }
 
 const handleError = (msg:string, status:number) => {

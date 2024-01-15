@@ -4,8 +4,8 @@ export interface IBaseLesson{
     id: string;
     title:string;
     description?:string;
-    order:string;
-    weight:string;
+    order:number;
+    weight:number;
     course_id:string;
 }
 

@@ -36,10 +36,10 @@ export class Exercise extends Model<IExercise,ExerciseCreationAttributes> {
   description: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
     allowNull: false,
   })
-  weight: string;
+  weight: number;
 
   @Column({
     type: DataType.STRING,
@@ -48,11 +48,11 @@ export class Exercise extends Model<IExercise,ExerciseCreationAttributes> {
   instruction: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
     allowNull: true
     
   })
-  order: string;
+  order: number;
 
   @ForeignKey(() => Lesson)
   @Column

@@ -5,4 +5,5 @@ export * from './lesson.interface';
 export * from './role.interface';
 export * from './exercise.interface';
 export * from './course.interface';
+export * from './common.interface';
 export * from './collection.interface';

@@ -3,6 +3,7 @@ import {hash,verify} from 'argon2';
 import {Request} from "express";
 import {UserService} from "../service/index.service";
 import { User } from "../models/user.model";
+import { IncludeOptions } from "sequelize";
 
 interface ITokenIssue{
   sub?:string,
@@ -37,8 +38,8 @@ export const isTokenValid = async function (token:string,secret:string) {
   return user;
 };
 
-export const isEmailVerified = async (filter:any) => {
-  const user = await UserService.fetchUser({ where: {...filter} });
+export const isEmailVerified = async (filter:IncludeOptions) => {
+  const user = await UserService.fetchUser(filter);
   return user?.is_email_confirmed;
 };
 

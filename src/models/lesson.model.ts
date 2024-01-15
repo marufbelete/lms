@@ -37,16 +37,16 @@ export class Lesson extends Model<ILesson,LessonCreationAttributes> {
   description: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
     allowNull: false,
   })
-  weight: string;
+  weight: number;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: true
   })
-  order: string;
+  order: number;
 
   @ForeignKey(() => Course)
   @Column

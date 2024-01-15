@@ -46,7 +46,7 @@ route.get(
 route.use(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: `${config.FE_URL}/dashboard`,
+    session: false,
     failureRedirect: `${config.FE_URL}/login`,
   }),
   issueGoogleToken,

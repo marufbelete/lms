@@ -1,3 +1,4 @@
+import { IncludeOptions, UpdateOptions} from "sequelize";
 import { User } from "../models/user.model";
 import {Options, PersonCreationAttributes} from "../types"
 
@@ -8,18 +9,18 @@ static async insertUser(param:PersonCreationAttributes,transaction={}){
   return new_user.save({...transaction})
 }
 
-static async editUser(param:PersonCreationAttributes,filter:any){
+static async editUser(param:PersonCreationAttributes,filter:UpdateOptions){
   return User.update(param,filter)
 }
 
-static async fetchUsers(filter:any,options?:Options){
+static async fetchUsers(filter:IncludeOptions,options?:Options){
   if(options?.scope){
   return User.scope(options.scope).findAll(filter)
   }
   return User.findAll(filter)
 }
 
-static async fetchUser(filter:any,options?:Options){
+static async fetchUser(filter:IncludeOptions,options?:Options){
   if(options?.scope){
   return User.scope(options.scope).findOne(filter)
   }

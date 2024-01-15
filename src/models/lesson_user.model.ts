@@ -27,13 +27,13 @@ export class Lesson_User extends Model {
     defaultValue:false
     
   })
-  is_started: string;
+  is_started: boolean;
 
   @Column({
     type: DataType.BOOLEAN,
     defaultValue:false     
   })
-  is_completed: string;
+  is_completed: boolean;
 
   @ForeignKey(() => Lesson)
   @Column

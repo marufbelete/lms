@@ -6,7 +6,9 @@ import { Exercise } from "./exercise.model";
 
 @Table({
   tableName: TABLE.STEP_VALIDATION,
-  modelName:'step_validation'
+  modelName:'step_validation',
+  createdAt: "created_at", 
+  updatedAt: "updated_at"
 })
 export class StepValidation extends Model {
   @Column({

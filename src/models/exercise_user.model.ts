@@ -24,7 +24,7 @@ export class Exercise_User extends Model {
     defaultValue:false
     
   })
-  is_completed: string;
+  is_completed: boolean;
 
 
   @ForeignKey(() => User)

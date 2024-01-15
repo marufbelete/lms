@@ -1,7 +1,7 @@
 
 require('dotenv').config()
 const DB_URL = process.env.NODE_ENV=='production'?
-process.env.DB_URL:process.env.DEV_DB_URL
+process.env.DATABASE_URL:process.env.DEV_DATABASE_URL
 const config = {
   development: {
     url: DB_URL,

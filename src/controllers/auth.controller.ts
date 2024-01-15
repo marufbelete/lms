@@ -1,4 +1,3 @@
-// const axios from "axios");
 import bouncer from "../helpers/bruteprotect";
 import {
   signupUserSchema,
@@ -31,11 +30,12 @@ import {
 import { Role } from "../models/role.model";
 import { getImage, saveImage } from "../helpers/file";
 import axios from "axios";
+import { IncludeOptions } from "sequelize";
 
 export default {
   registerUser: async (
     req: Request<{}, {}, PersonCreationAttributes>,
-    res: Response<IResponse<UserResponse>, any>,
+    res: Response<IResponse<UserResponse>, {}>,
     next: NextFunction
   ) => {
     try {
@@ -51,7 +51,7 @@ export default {
         const token = issueToken({ email: email! }, config.ACCESS_TOKEN_SECRET);
         const mailOptions = accountConfirmationEmail(email!, username!, token);
         // if (await isEmailExist(email)) {
-        //   if (await isEmailVerified({ email })) {
+        //   if (await isEmailVerified({where:{ email }})) {
         //     handleError("User already exists with this email", 400);
         //   }
         //   else {
@@ -88,8 +88,11 @@ export default {
         const user = await UserService.insertUser(user_to_add, {
           transaction: t,
         });
-        const role_filter = role_id ? { id: role_id } : { name: ROLE.STUDENT };
-        const role = await RoleService.fetchRole({ where: role_filter });
+        const role_filter:IncludeOptions = role_id ? { where:{ id: role_id }} : { where:{ name: ROLE.STUDENT }};
+        const role = await RoleService.fetchRole(role_filter);
+        if(!role){
+          return handleError("role not found",404)
+        }
         await user.$add("role", role, { transaction: t });
 
         // await sendEmail(mailOptions);
@@ -134,7 +137,7 @@ export default {
 
   loginUser: async (
     req: Request<{}, {}, ILogin>,
-    res: Response<IResponse<UserResponse>, any>,
+    res: Response<IResponse<UserResponse>, {}>,
     next: NextFunction
   ) => {
     try {
@@ -219,10 +222,13 @@ export default {
       const { verifyToken } = req.query as { verifyToken: string };
       const user = await isTokenValid(verifyToken, config.ACCESS_TOKEN_SECRET);
       if (user) {
-        const filter = { where: { id: user?.sub } };
+        const filter:IncludeOptions = { where: { id: user?.sub } };
         const userInfo = await UserService.fetchUser(filter, {
           scope: "user_role_state",
         });
+        if(!userInfo){
+          return handleError("user not found",404)
+        }
         userInfo.is_email_confirmed = true;
 
         const access_token = issueToken(
@@ -258,9 +264,9 @@ export default {
       }
       const user = await getLoggedUser(req);
       if (!user) {
-        handleError("please login!", 403);
+        return handleError("please login!", 403);
       }
-      if (!user?.is_local_auth) {
+      if (user?.is_local_auth) {
         handleError("This account uses google authentication.", 403);
       }
       const { old_password, new_password } = req.body;
@@ -284,7 +290,7 @@ export default {
 
   authProfile: async (
     req: Request,
-    res: Response<IResponse<UserResponse>, any>,
+    res: Response<IResponse<UserResponse>, {}>,
     next: NextFunction
   ) => {
     try {

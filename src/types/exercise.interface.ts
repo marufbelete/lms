@@ -12,8 +12,8 @@ export interface IBaseExercise{
         error_message: string;
         success_message: string;
     }
-    order:string;
-    weight:string;
+    order:number;
+    weight:number;
 
 }
 

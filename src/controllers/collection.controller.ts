@@ -7,6 +7,7 @@ import { Course } from "../models/course.model";
 import { mapCollectionCourseImage } from "../helpers/common";
 import { getByIdSchema } from "../validation/common.validation";
 import { CollectionCreationAttributes } from "../types/collection.interface";
+import { IncludeOptions, UpdateOptions } from "sequelize";
 
 export default{
   addCollection : async(req:Request<{},{},CollectionCreationAttributes>,
@@ -27,7 +28,7 @@ export default{
   
   getCollections : async(req:Request, res:Response, next:NextFunction)=>{
       try{
-        const filter = {
+        const filter:IncludeOptions = {
           include:[{
             model:Course
             }]
@@ -45,7 +46,7 @@ export default{
       try{
         const {id}=req.params;
         const param=req.body;
-        const filter={
+        const filter:UpdateOptions={
           where:{
           id
           },
@@ -73,7 +74,7 @@ export default{
         if(error){
           handleError(error.message,403)
         }
-        const filter={
+        const filter:IncludeOptions={
           where:{id},
             include:[{
               model:Course
@@ -96,7 +97,7 @@ export default{
         if(error){
           handleError(error.message,403)
         }
-        const filter = {
+        const filter:IncludeOptions = {
           where:{
             id
           }

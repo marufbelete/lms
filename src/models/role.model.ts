@@ -29,7 +29,7 @@ export class Role extends Model<IRole,RoleCreationAttributes> {
         try {
           const existingRole = await Role.findOne({ where: { name: value } });
           if (existingRole) {
-            throw new Error("Role name is already in use.");
+            throw new Error("Role name is already in exist.");
           }
         } catch (err:any) {
           throw new Error(err.message);

@@ -4,15 +4,17 @@ export interface IBaseCourse{
     id: string;
     title:string;
     description?:string;
-    image?:string;
+    image?:string|null;
     estimatedTime?:string;
-    difficulty?:boolean;
+    difficulty?:string;
     prerequisiteIds?:string[];
     collectionId?:string;
 }
 
 export interface ICourse extends IBaseCourse{
     cover_url?:string;
+    progress?: number; // Assuming progress is a number, adjust the type accordingly
+    current_lesson_id?: string;
 }
 
 

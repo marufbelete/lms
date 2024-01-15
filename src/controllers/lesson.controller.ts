@@ -9,14 +9,14 @@ import { validateAddLessonInput, validateUpdateLessonInput } from "../validation
 import { handleError } from "../helpers/handleError";
 import {LessonService,CourseService} from "../service/index.service"
 import { getByIdSchema } from "../validation/common.validation";
-import { IncludeOptions} from "sequelize";
+import { IncludeOptions, OrderItem, UpdateOptions} from "sequelize";
 import { LessonCreationAttributes } from "../types/lesson.interface";
 
 export default{
   addLesson:async(req:Request<{course_id:string},{},LessonCreationAttributes>,
     res:Response, next:NextFunction)=>{
-      const t=await sequelize.transaction()
       try{
+        return await sequelize.transaction(async (t) => {
         const param= req.body;
         const {course_id} =req.params;
         const {error}=await validateAddLessonInput({...param,course_id})
@@ -26,10 +26,11 @@ export default{
         const lesson = await LessonService.insertLesson(param,{transaction: t });
         const course=await CourseService.fetchCourse({where:{id:course_id}})
         if(!course){
-          handleError("course does not exist",403)
+          return handleError("course does not exist",403)
         }
         await course.$add('lesson',lesson,{transaction: t })
     
+        //add to existing user
         const course_takers=await Course_User.findAll(
         {where:{courseId:course_id},include:{model:User}})
         if(course_takers.length>0){
@@ -38,15 +39,11 @@ export default{
               {through: { courseUserId: course_taker.id },transaction: t })
           }
         }
-    
-        await t.commit()
-        return res.status(201).json({
-          success:true,
-          message:"lesson added"
-        });
-      }
+        await lesson.reload({transaction: t })
+        return res.status(201).json(lesson);
+      });
+    }
       catch(error){
-        await t.rollback()
        next(error)
       }
     },
@@ -56,13 +53,8 @@ export default{
       try{
         const {course,exercise}=req.query
         const {course_id}=req.params
-        interface Filter {
-            where: { courseId: string }; 
-            include: Array<any>;
-            order: Array<any[]>;
-          }
-      
-        const filter:Filter={
+
+        const filter:IncludeOptions={
           where:{
            courseId:course_id
           },
@@ -70,18 +62,18 @@ export default{
           order:[
             ['order','ASC'],
             ['createdAt','ASC']
-          ]
+          ],
         }
         if (course) {
-          filter.include.push({
+          filter.include?.push({
               model: Course,
             })
           }
         if (exercise) {
-          filter.order.push(
-          [Exercise,'order','ASC'],
-          [Exercise,'createdAt','ASC'])
-          filter.include.push({
+          (filter.order as OrderItem[]).push(
+          [{model:Exercise,as:'exercises'},'order','ASC'],
+          [{model:Exercise,as:'exercises'},'createdAt','ASC'])
+          filter.include!.push({
               model: Exercise
             })
         }
@@ -98,12 +90,15 @@ export default{
       try{
         const {lesson_id}=req.params;
         const param=req.body;
-        const filter={
+        const filter:UpdateOptions={
           where:{
           id:lesson_id
           }
         };
         const lesson= await LessonService.fetchLesson({where:{id:lesson_id}})
+        if(!lesson){
+          return handleError("lesson not found",404)
+        }
         const {error}=await validateUpdateLessonInput({
           course_id:lesson.courseId,lesson_id,...param
         })
@@ -138,8 +133,8 @@ export default{
           }
         if (exercise) {
           filter.order=[
-            [Exercise,'order','ASC'],
-            [Exercise,'createdAt','ASC']
+            [{model:Exercise,as:'exercises'},'order','ASC'],
+            [{model:Exercise,as:'exercises'},'createdAt','ASC']
           ]
           filter.include!.push({
               model: Exercise
@@ -161,7 +156,7 @@ export default{
         if(error){
           handleError(error.message,403)
         }
-        const filter = {
+        const filter:IncludeOptions = {
           where:{
             id:lesson_id
           }

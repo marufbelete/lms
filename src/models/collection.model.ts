@@ -34,7 +34,7 @@ export class Collection extends Model<ICollection,CollectionCreationAttributes> 
 
 
   @HasMany(()=> Course)
-  course?: Course[];
+  courses?: Course[];
 
   @BelongsToMany(()=> User,()=>Collection_User)
   users?: Array<User & {collection_user: Collection_User}>;

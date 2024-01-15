@@ -6,8 +6,10 @@ import { Course } from "../models/course.model";
 import {
   mapCollectionCourseImage,
   mapCourseCompleted,
+  mapCourseImage,
   mapCourseUserInfo,
   mapUserExerciseInfo,
+  paginate,
 } from "../helpers/common";
 import {
   courseToLoggedUserSchema,
@@ -29,13 +31,14 @@ import { Exercise } from "../models/exercise.model";
 import { Exercise_User } from "../models/exercise_user.model";
 import { StepValidation } from "../models/step_validation.model";
 import { Course_User } from "../models/course_user.model";
-import { IResponse, UserResponse } from "../types";
+import { IResponse, IncludeOptionsWithTransaction, UserResponse } from "../types";
 import { User } from "../models/user.model";
+import { IncludeOptions } from "sequelize";
 
 export default {
   updateLoggedUserProfile: async (
     req: Request,
-    res: Response<IResponse<UserResponse>, any>,
+    res: Response<IResponse<UserResponse>, {}>,
     next: NextFunction
   ) => {
     try {
@@ -43,16 +46,11 @@ export default {
       if (error) {
         handleError(error.message, 400);
       }
+
       const user = await getLoggedUser(req);
       if (!user) {
-        handleError("user not exist!", 404);
+        return handleError("user not exist!", 404);
       }
-      const filter = {
-        where: {
-          id: user?.id,
-        },
-        returning: true,
-      };
       const update_info = { ...req.body };
       let profile_url;
       let key = user?.avatar;
@@ -64,9 +62,15 @@ export default {
       if (key) {
         profile_url = await getImage(key);
       }
-      const [, user_info] = await UserService.editUser(update_info, filter);
+
+      await UserService.editUser(update_info, {
+        where: {
+          id: user?.id,
+        },
+      });
+      user.reload();
       return res.status(201).json({
-        data: mapUserRole(user_info[0],profile_url),
+        data: mapUserRole(user, profile_url),
         success: true,
         message: "profile updated!",
       });
@@ -98,7 +102,7 @@ export default {
     next: NextFunction
   ) => {
     try {
-      await sequelize.transaction(async (t) => {
+      return await sequelize.transaction(async (t) => {
         const { course_id } = req.body as { course_id: string };
         const { error } = courseToLoggedUserSchema.validate({
           course_id,
@@ -131,17 +135,9 @@ export default {
           ],
         });
         if (!course) {
-          handleError("Course not exist", 404);
+          return handleError("Course not exist", 404);
         }
 
-        //  const leastOrderLesson = await fetchLesson({
-        //   where: { courseId: course_id },
-        //   order:[
-        //     ['order','ASC'],
-        //     ['createdAt','ASC']
-        //   ]
-        //   });
-        //may remove this  currentLessonId: leastOrderLesson.id
         const [course_user] = (await user?.$add("course", course, {
           transaction: t,
         })) as Course_User[];
@@ -149,12 +145,6 @@ export default {
           through: { courseUserId: course_user.id },
           transaction: t,
         })) as Lesson_User[];
-
-        //may goes to start api
-        // await editLessonUser(
-        //   { is_started: true },
-        //   { where: { lessonId: leastOrderLesson.id, userId: user.id },transaction: t }
-        // );
 
         for (let lesson of course?.lessons || []) {
           let lesson_user = lesson_users.find((e) => e.lessonId === lesson.id);
@@ -165,15 +155,11 @@ export default {
             }));
         }
         const collection = await course.$get("collection");
-        if (!collection) return;
-        if (await collection.$has("user", user!)) return;
+        if (!collection) return res.status(201).json(course);
+        if (await collection.$has("user", user!))
+          return res.status(201).json(course);
         await collection.$add("user", user!, { transaction: t });
-        return;
-      });
-
-      return res.status(201).json({
-        success: true,
-        message: "You are registerd for the course successfully",
+        return res.status(201).json(course);
       });
     } catch (err) {
       next(err);
@@ -182,19 +168,31 @@ export default {
 
   startCourse: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await sequelize.transaction(async (t) => {
+      return await sequelize.transaction(async (t) => {
         const { course_id, force } = req.body;
         const user = await getLoggedUser(req);
         if (!user) {
           return handleError("user does not exist", 404);
         }
         if (!force) {
-          const { prereq } = await CourseService.coursePrerequisiteNotCompleted(
-            course_id,
-            user.id
-          );
-          if (prereq&&prereq.length > 0) {
-            return { prereq: mapCourseCompleted(prereq), status: false };
+          const prereq_info =
+            await CourseService.coursePrerequisiteNotCompleted(
+              course_id,
+              user.id
+            );
+          if (
+            prereq_info &&
+            prereq_info.prereq &&
+            prereq_info.prereq.length > 0
+          ) {
+            return res
+              .status(403)
+              .json({
+                message:
+                  "Would you like to continue without completing the prerequisite course?",
+                data: prereq_info,
+                status: false,
+              });
           }
         }
         const leastOrderLesson = await LessonService.fetchLesson({
@@ -204,6 +202,9 @@ export default {
             ["createdAt", "ASC"],
           ],
         });
+        if (!leastOrderLesson) {
+          return handleError("unable to find the lesson", 404);
+        }
         await CourseService.editCourseUser(
           {
             currentLessonId: leastOrderLesson.id,
@@ -218,9 +219,23 @@ export default {
             transaction: t,
           }
         );
-        return { status: true };
+        const filter:IncludeOptionsWithTransaction = {
+          where:{id:course_id},
+          include:[{
+            model: Lesson,
+            as: 'lessons'
+          }],
+          order: [
+            [{model:Lesson, as: 'lessons'}, "order", "ASC"],
+            [{model:Lesson, as: 'lessons'}, "createdAt", "ASC"],
+          ],
+          transaction:t
+        };
+        const result = await CourseService.fetchCourse(filter);
+        if(!result)return res.json(result);
+        const [mapped_result] = await mapCourseImage([result]);
+        return res.json(mapped_result);
       });
-      return res.json(result);
     } catch (err) {
       next(err);
     }
@@ -258,10 +273,32 @@ export default {
       const user_courses = await ExerciseService.getCoursesInfo({
         where: { userId: user.id },
         order: [
-          [Lesson_User, Lesson, "order", "ASC"],
-          [Lesson_User, Lesson, "createdAt", "ASC"],
-          [Lesson_User, Exercise_User, Exercise, "order", "ASC"],
-          [Lesson_User, Exercise_User, Exercise, "createdAt", "ASC"],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Lesson, as: "lesson" },
+            "order",
+            "ASC",
+          ],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Lesson, as: "lesson" },
+            "createdAt",
+            "ASC",
+          ],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Exercise_User, as: "exercise_users" },
+            { model: Exercise, as: "exercise" },
+            "order",
+            "ASC",
+          ],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Exercise_User, as: "exercise_users" },
+            { model: Exercise, as: "exercise" },
+            "createdAt",
+            "ASC",
+          ],
         ],
       });
       return res.json(mapCourseUserInfo(user_courses));
@@ -287,13 +324,13 @@ export default {
       if (!user) {
         return handleError("user not exist", 404);
       }
-      const [user_course] = await ExerciseService.getCoursesWithProgress({
+      const user_course = await ExerciseService.getCoursesWithProgress({
         where: { userId: user.id, courseId: course_id },
       });
-      if (!user_course) {
-        handleError("course not found", 404);
+      if (user_course.length == 0) {
+        return handleError("Course progress for the user not found", 404);
       }
-      return res.json(user_course);
+      return res.json(user_course[0]);
     } catch (err) {
       next(err);
     }
@@ -319,10 +356,32 @@ export default {
       const user_courses = await ExerciseService.getCoursesInfo({
         where: { userId: user.id, courseId: course_id },
         order: [
-          [Lesson_User, Lesson, "order", "ASC"],
-          [Lesson_User, Lesson, "createdAt", "ASC"],
-          [Lesson_User, Exercise_User, Exercise, "order", "ASC"],
-          [Lesson_User, Exercise_User, Exercise, "createdAt", "ASC"],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Lesson, as: "lesson" },
+            "order",
+            "ASC",
+          ],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Lesson, as: "lesson" },
+            "createdAt",
+            "ASC",
+          ],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Exercise_User, as: "exercise_users" },
+            { model: Exercise, as: "exercise" },
+            "order",
+            "ASC",
+          ],
+          [
+            { model: Lesson_User, as: "lesson_users" },
+            { model: Exercise_User, as: "exercise_users" },
+            { model: Exercise, as: "exercise" },
+            "createdAt",
+            "ASC",
+          ],
         ],
       });
       if (user_courses.length < 1) {
@@ -386,34 +445,6 @@ export default {
     }
   },
 
-  getCollection: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const { error } = getByIdSchema.validate({ id });
-      if (error) {
-        handleError(error.message, 403);
-      }
-      const user = await getLoggedUser(req);
-      if (!user) {
-        return handleError("User does not exist", 404);
-      }
-      const filter = {
-        where: { id },
-        include: [
-          {
-            model: Course,
-          },
-        ],
-      };
-      const result = await user.$get("collections", filter);
-      if (!result) return res.json(result);
-      const [mapped_result] = await mapCollectionCourseImage([result]);
-      return res.json(mapped_result);
-    } catch (error) {
-      next(error);
-    }
-  },
-
   getUserCollections: async (
     req: Request,
     res: Response,
@@ -424,7 +455,7 @@ export default {
       if (!user) {
         return handleError("User does not exist", 404);
       }
-      const filter = {
+      const filter: IncludeOptions = {
         include: [
           {
             model: Course,

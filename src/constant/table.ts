@@ -9,7 +9,8 @@ export const TABLE={
     EXERCISE:'exercises',
     EXERCISE_USER:'exercise_users',
     STEP_VALIDATION:'step_validations',
-    COLLECTION:'colections',
-    COLLECTION_USER:'colections_user',
-    PREREQUISITE:'rerequisite'
+    COLLECTION:'collections',
+    COLLECTION_USER:'collection_users',
+    PREREQUISITE:'prerequisites'
+
 }

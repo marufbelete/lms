@@ -6,6 +6,7 @@ import { ROLE } from "../constant/role";
 import { RoleService} from "../service/index.service";
 import { issueToken } from "../helpers/user";
 import {Request,Response,NextFunction} from 'express'
+import { handleError } from "../helpers/handleError";
 const GoogleStrategy = passportGoogle.Strategy;
  
 
@@ -38,6 +39,9 @@ const googleStrategy =new GoogleStrategy(
                 name:ROLE.STUDENT
               }
             });
+            if(!role){
+              return handleError("default role found",404)
+            }
             await user.$add('role',role);
           }
           done(null, user);
@@ -55,15 +59,13 @@ const issueGoogleToken = async (req:Request, res:Response, next:NextFunction) =>
       {expiresIn: config.ACCESS_TOKEN_EXPIRES }
     );
     return res
-    .cookie("access_token", {
+    .cookie("access_token",access_token, {
         sameSite: "none",
         path: "/",
         secure: true,
         httpOnly: true,
       })
-    .redirect(`${config.FE_URL}/dashboard?auth=true&type=google
-      &first_name=${user.first_name}&last_name=${user.last_name}
-      &email=${user.email}&access_token=${access_token}`);
+    .redirect(`${config.FE_URL}/dashboard`);
   } catch (err) {
     next(err);
   }

@@ -1,3 +1,4 @@
+import { IncludeOptions, UpdateOptions } from "sequelize";
 import { handleError } from "../helpers/handleError";
 import { 
  RoleService
@@ -38,7 +39,7 @@ export default{
       try{
         const {id}=req.params;
         const param=req.body;
-        const filter={
+        const filter:UpdateOptions={
           where:{
           id
           }
@@ -65,7 +66,7 @@ export default{
         if(error){
           handleError(error.message,403)
         }
-        const filter={
+        const filter:IncludeOptions={
           where:{id}
         };
         const result = await RoleService.fetchRole(filter);
@@ -83,7 +84,7 @@ export default{
         if(error){
           handleError(error.message,403)
         }
-        const filter = {
+        const filter:IncludeOptions = {
           where:{
             id
           }

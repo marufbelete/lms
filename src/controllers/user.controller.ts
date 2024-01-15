@@ -25,14 +25,17 @@ addRoleToUser : async (req:Request, res:Response, next:NextFunction) => {
     
     const user=await UserService.fetchUserById(user_id)
     if(!user){
-      handleError("user does not exist",403)
+      return handleError("user does not exist",404)
     }
     const existing_user_roles=await user?.$get('roles')
-    if(existing_user_roles?.find((e:any)=>e.id===role_id))
+    if(existing_user_roles?.find((e)=>e.id===role_id))
      {
-      handleError("This role already exist",403)
+      return handleError("This role already exist",403)
      }
      const role = await RoleService.fetchRole({where:{id:role_id}})
+     if(!role){
+      return handleError("role not found",404)
+     }
      await user?.$add('role',role)
      return res.status(201).json({
        success:true,
@@ -58,9 +61,12 @@ deleteRoleFromUser  : async (req:Request, res:Response, next:NextFunction) => {
       handleError("user does not exist",403)
     }
     const existing_user_roles=await user?.$get('roles')
-      if(existing_user_roles?.find((e:any)=>e.id===role_id))
+      if(existing_user_roles?.find((e)=>e.id===role_id))
      {
       const role = await RoleService.fetchRole({where:{id:role_id}})
+      if(!role){
+        return handleError("role not found",404)
+       }
       await user?.$remove('role',role)
       return res.status(201).json({
         success:true,
@@ -74,8 +80,8 @@ deleteRoleFromUser  : async (req:Request, res:Response, next:NextFunction) => {
 },
 
 registerUserForCourse : async (req:Request, res:Response, next:NextFunction) => {
-  const t=await sequelize.transaction()
   try {
+    return await sequelize.transaction(async (t) => {
     const {id:user_id}= req.params
     const {course_id}= req.body
     const {error}=courseToUserSchema.validate({
@@ -89,7 +95,7 @@ registerUserForCourse : async (req:Request, res:Response, next:NextFunction) => 
       return handleError("user does not exist",403)
     }
     const existing_user_courses=await user?.$get('courses')
-      if(existing_user_courses?.find((e:any)=>e.id===course_id)){
+      if(existing_user_courses?.find((e)=>e.id===course_id)){
       handleError("This user already registerd for the course",403)
      }
      const course = await CourseService.fetchCourse({where:{id:course_id},
@@ -116,30 +122,31 @@ registerUserForCourse : async (req:Request, res:Response, next:NextFunction) => 
         ['createdAt','ASC']
       ]
       });
-    //   const [course_user]=await user.addCourse(course,{through: { currentLessonId: leastOrderLesson.id }, transaction: t })
+      if(!leastOrderLesson){
+        return handleError("lesson to start not found",404)
+       }  
       const [course_user]=await user.$add('course',course,{through: 
       { currentLessonId: leastOrderLesson.id }, transaction: t }) as Course_User[]
       const lesson_users=await user.$add('lessons',course.lessons!,
       {through: { courseUserId: course_user.id },transaction: t }) as Lesson_User[]
 
 
-      await LessonService.editLesson(
-        { is_started: true },
+      await LessonService.editLessonUser(
+        { is_started:true },
         { where: { lessonId: leastOrderLesson.id, userId: user_id },transaction: t }
       );
 
       for(let lesson of course?.lessons||[]){
-        let lesson_user=lesson_users?.find((e:any)=>e.lessonId===lesson.id)
+        let lesson_user=lesson_users?.find((e)=>e.lessonId===lesson.id)
         await user.$add('exercises',lesson?.exercises!,
         { through: { lessonUserId:lesson_user?.id },transaction: t })
       }
-     await t.commit()
      return res.status(201).json({
        success:true,
        message:"You are registerd for the course successfully"
      })
+    })
   } catch (err) {
-    await t.rollback()
     next(err);
   }
 },
@@ -181,11 +188,19 @@ getUserCoursesInfo : async (req:Request, res:Response, next:NextFunction) => {
       handleError("user does not exist",403)
     }
     const user_courses=await ExerciseService.getCoursesInfo({where: { userId:id },order:[
-      [Lesson_User,Lesson,'order','ASC'],
-      [Lesson_User,Lesson,'createdAt','ASC'],
-      [Lesson_User,Exercise_User,Exercise,'order','ASC'],
-      [Lesson_User,Exercise_User,Exercise,'createdAt','ASC']
+      [{model:Lesson_User, as:'lesson_users'}, 
+      {model:Lesson,as:'lesson'}, "order", "ASC"],
+      [{model:Lesson_User, as:'lesson_users'}, 
+      {model:Lesson,as:'lesson'}, "createdAt", "ASC"],
+      [{model:Lesson_User, as:'lesson_users'}, 
+      {model:Exercise_User,as:'exercise_users'}, 
+      {model:Exercise,as:'exercise'}, "order", "ASC"],
+      [{model:Lesson_User, as:'lesson_users'}, 
+      {model:Exercise_User,as:'exercise_users'},
+      {model:Exercise,as:'exercise'}, "createdAt", "ASC"],
     ]})
+
+
     return res.json(mapCourseUserInfo(user_courses))
 
   } catch (err) {
@@ -206,10 +221,13 @@ getUserCourseWithProgress : async (req:Request, res:Response, next:NextFunction)
     if(!user){
       handleError("user does not exist",403)
     }
-    const [user_course]=await ExerciseService.getCoursesWithProgress({
+    const user_course=await ExerciseService.getCoursesWithProgress({
       where: { userId:user_id, courseId:course_id}
     })
-     return res.json(user_course)
+  if(user_course.length==0){
+      return handleError("Course progress for the user not found",404)
+    }
+    return res.json(user_course[0])
     
   } catch (err) {
     next(err);
@@ -232,10 +250,16 @@ getUserCourseInfo : async (req:Request, res:Response, next:NextFunction) => {
     }
     const user_courses=await ExerciseService.getCoursesInfo({
       where: { userId:user_id, courseId:course_id},order:[
-        [Lesson_User,Lesson,'order','ASC'],
-        [Lesson_User,Lesson,'createdAt','ASC'],
-        [Lesson_User,Exercise_User,Exercise,'order','ASC'],
-        [Lesson_User,Exercise_User,Exercise,'createdAt','ASC']
+        [{model:Lesson_User, as:'lesson_users'}, 
+        {model:Lesson,as:'lesson'}, "order", "ASC"],
+        [{model:Lesson_User, as:'lesson_users'}, 
+        {model:Lesson,as:'lesson'}, "createdAt", "ASC"],
+        [{model:Lesson_User, as:'lesson_users'}, 
+        {model:Exercise_User,as:'exercise_users'}, 
+        {model:Exercise,as:'exercise'}, "order", "ASC"],
+        [{model:Lesson_User, as:'lesson_users'}, 
+        {model:Exercise_User,as:'exercise_users'},
+        {model:Exercise,as:'exercise'}, "createdAt", "ASC"],
       ]
     })
     if(user_courses.length<1){

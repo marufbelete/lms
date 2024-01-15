@@ -4,7 +4,6 @@ export interface IBaseCollection{
     id: string;
     title:string;
     description?:string;
-  
 
 }
 

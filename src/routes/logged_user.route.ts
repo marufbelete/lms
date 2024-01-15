@@ -4,7 +4,6 @@ import { authenticateJWT } from "../middleware/auth.middleware";
 import ExerciseController from "../controllers/exercise.controller";
 import { uploadImage } from "../helpers/file";
 import Logged_userController from "../controllers/logged_user.controller";
-import CollectionController from "../controllers/collection.controller";
 const route = express.Router({ mergeParams: true });
 
 route.put(
@@ -71,13 +70,7 @@ route.put(
 route.get(
   "/collection",
   authenticateJWT,
-  CollectionController.getCollections,
-  errorHandler
-);
-route.get(
-  "/collection/:id",
-  authenticateJWT,
-  CollectionController.getCollection,
+  Logged_userController.getUserCollections,
   errorHandler
 );
 
