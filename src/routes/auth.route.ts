@@ -53,7 +53,7 @@ route.use(
   errorHandler
 );
 
-route.post("/logoummt", AuthController.logoutUser, errorHandler);
+route.post("/logout", AuthController.logoutUser, errorHandler);
 
 route.post("/confirm", AuthController.confirmEmail, errorHandler);
 

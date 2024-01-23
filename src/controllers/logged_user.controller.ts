@@ -87,11 +87,14 @@ export default {
   ) => {
     try {
       const user = await getLoggedUser(req);
+      let profile_url;
       if (!user) {
-        return handleError("user not exist!", 404);
+        return handleError("access forbidden", 403);
       }
-      const user_info = await UserService.fetchUserById(user?.id!);
-      return res.status(201).json(user_info);
+      if (user && user?.avatar) {
+        profile_url = await getImage(user?.avatar);
+      }
+      return res.status(200).json(mapUserRole(user,profile_url));
     } catch (err) {
       next(err);
     }
