@@ -1,18 +1,23 @@
 import { TABLE } from "../constant/table";
-import { Table, Model, Column, DataType,
-BelongsTo, ForeignKey } from "sequelize-typescript";
+import {
+  Table,
+  Model,
+  Column,
+  DataType,
+  BelongsTo,
+  ForeignKey,
+} from "sequelize-typescript";
 import { User } from "./user.model";
 import { Role } from "./role.model";
 
-
 @Table({
   tableName: TABLE.USER_ROLE,
-  modelName:'user_role'
+  modelName: "user_role",
 })
 export class User_Role extends Model {
   @Column({
     type: DataType.UUID,
-    defaultValue:DataType.UUIDV4,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
     primaryKey: true,
   })
@@ -20,7 +25,7 @@ export class User_Role extends Model {
 
   @Column({
     type: DataType.BOOLEAN,
-    defaultValue:true
+    defaultValue: true,
   })
   is_active: boolean;
 
@@ -30,13 +35,11 @@ export class User_Role extends Model {
 
   @ForeignKey(() => Role)
   @Column
-  roleId?:string;
-
+  roleId?: string;
 
   @BelongsTo(() => User)
-  user?:User;
+  user?: User;
 
   @BelongsTo(() => Role)
-  role?:Role;
-
+  role?: Role;
 }

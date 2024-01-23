@@ -1,10 +1,10 @@
-import Joi from 'joi';
+import Joi from "joi";
 
 export const addRoleSchema = Joi.object({
-    name: Joi.string().required(),
+  name: Joi.string().required(),
 });
 
 export const updateRoleSchema = Joi.object({
-    id: Joi.any().required(),
-    name: Joi.string().required()
+  id: Joi.any().required(),
+  name: Joi.string().required(),
 });

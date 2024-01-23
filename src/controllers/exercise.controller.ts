@@ -72,7 +72,7 @@ export default {
             });
           }
         }
-       await exercise.reload({transaction: t })
+        await exercise.reload({ transaction: t });
         return res.status(201).json(exercise);
       });
     } catch (error) {

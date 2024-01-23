@@ -1,18 +1,23 @@
 import { TABLE } from "../constant/table";
-import { Table, Model, Column, DataType,
-ForeignKey,BelongsTo} from "sequelize-typescript";
+import {
+  Table,
+  Model,
+  Column,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
 import { User } from "./user.model";
 import { Collection } from "./collection.model";
-    
-    
+
 @Table({
   tableName: TABLE.COLLECTION_USER,
-  modelName:'collection_user',
+  modelName: "collection_user",
 })
 export class Collection_User extends Model {
   @Column({
     type: DataType.UUID,
-    defaultValue:DataType.UUIDV4,
+    defaultValue: DataType.UUIDV4,
     primaryKey: true,
     allowNull: false,
   })
@@ -20,32 +25,27 @@ export class Collection_User extends Model {
 
   @Column({
     type: DataType.BOOLEAN,
-    defaultValue:false
-    
+    defaultValue: false,
   })
   is_started: string;
 
   @Column({
     type: DataType.BOOLEAN,
-    defaultValue:false     
+    defaultValue: false,
   })
   is_completed: string;
 
   @ForeignKey(() => User)
   @Column
-  userId:string;
+  userId: string;
 
   @ForeignKey(() => Collection)
   @Column
-  collectionId:string;
+  collectionId: string;
 
-
-  @BelongsTo(()=> User)
+  @BelongsTo(() => User)
   user?: User;
 
-  @BelongsTo(()=> Collection)
+  @BelongsTo(() => Collection)
   collection?: Collection;
-
 }
-    
-    

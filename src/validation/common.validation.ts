@@ -1,6 +1,5 @@
-import Joi from 'joi';
+import Joi from "joi";
 
 export const getByIdSchema = Joi.object({
-    id: Joi.string().required(),
+  id: Joi.string().required(),
 });
-

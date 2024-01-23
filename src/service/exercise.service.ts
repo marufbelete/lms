@@ -8,7 +8,11 @@ import { Exercise_User } from "../models/exercise_user.model";
 import { Lesson } from "../models/lesson.model";
 import { Lesson_User } from "../models/lesson_user.model";
 import { LessonService } from "./index.service";
-import { ExerciseCreationAttributes, ICourse, IncludeOptionsWithTransaction } from "../types";
+import {
+  ExerciseCreationAttributes,
+  ICourse,
+  IncludeOptionsWithTransaction,
+} from "../types";
 
 export class ExerciseService {
   static async insertExercise(param: ExerciseCreationAttributes, t = {}) {
@@ -93,7 +97,7 @@ export class ExerciseService {
       ],
     });
 
-    const course_with_progress: ICourse[]= course_tracked.map((e) => {
+    const course_with_progress: ICourse[] = course_tracked.map((e) => {
       const progress = calculateCompletedExerciseWeight(e);
       const current_lesson_id = e.currentLessonId;
       return {
@@ -101,10 +105,10 @@ export class ExerciseService {
         progress,
         current_lesson_id,
       };
-  })
-  
-  return course_with_progress 
-}
+    });
+
+    return course_with_progress;
+  }
 
   static async getCoursesInfo(filter: IncludeOptions) {
     const course_info = await Course_User.findAll({
@@ -117,7 +121,7 @@ export class ExerciseService {
         },
         {
           model: Lesson_User,
-          attributes: ["is_started","is_completed"],
+          attributes: ["is_started", "is_completed"],
           include: [
             {
               model: Lesson,
@@ -126,10 +130,12 @@ export class ExerciseService {
             {
               model: Exercise_User,
               attributes: ["is_completed"],
-              include: [{
-                model: Exercise,
-                attributes: ["id", "title"],
-              }],
+              include: [
+                {
+                  model: Exercise,
+                  attributes: ["id", "title"],
+                },
+              ],
             },
           ],
         },

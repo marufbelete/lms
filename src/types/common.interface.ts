@@ -1,4 +1,4 @@
-import { IncludeOptions, Transaction } from 'sequelize';
+import { IncludeOptions, Transaction } from "sequelize";
 
 export interface IncludeOptionsWithTransaction extends IncludeOptions {
   transaction?: Transaction;

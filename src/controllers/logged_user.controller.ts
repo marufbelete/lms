@@ -31,14 +31,19 @@ import { Exercise } from "../models/exercise.model";
 import { Exercise_User } from "../models/exercise_user.model";
 import { StepValidation } from "../models/step_validation.model";
 import { Course_User } from "../models/course_user.model";
-import { IResponse, IncludeOptionsWithTransaction, UserResponse } from "../types";
+import {
+  IResponse,
+  IncludeOptionsWithTransaction,
+  UserResponse,
+} from "../types";
 import { User } from "../models/user.model";
 import { IncludeOptions } from "sequelize";
 
 export default {
   updateLoggedUserProfile: async (
     req: Request,
-    res: Response<IResponse<UserResponse>, {}>,
+    res: Response,
+    // <IResponse<UserResponse>, {}>,
     next: NextFunction
   ) => {
     try {
@@ -69,11 +74,7 @@ export default {
         },
       });
       user.reload();
-      return res.status(201).json({
-        data: mapUserRole(user, profile_url),
-        success: true,
-        message: "profile updated!",
-      });
+      return res.status(201).json(mapUserRole(user, profile_url));
     } catch (err) {
       next(err);
     }
@@ -185,14 +186,12 @@ export default {
             prereq_info.prereq &&
             prereq_info.prereq.length > 0
           ) {
-            return res
-              .status(403)
-              .json({
-                message:
-                  "Would you like to continue without completing the prerequisite course?",
-                data: prereq_info,
-                status: false,
-              });
+            return res.status(403).json({
+              message:
+                "Would you like to continue without completing the prerequisite course?",
+              data: prereq_info,
+              status: false,
+            });
           }
         }
         const leastOrderLesson = await LessonService.fetchLesson({
@@ -219,20 +218,22 @@ export default {
             transaction: t,
           }
         );
-        const filter:IncludeOptionsWithTransaction = {
-          where:{id:course_id},
-          include:[{
-            model: Lesson,
-            as: 'lessons'
-          }],
-          order: [
-            [{model:Lesson, as: 'lessons'}, "order", "ASC"],
-            [{model:Lesson, as: 'lessons'}, "createdAt", "ASC"],
+        const filter: IncludeOptionsWithTransaction = {
+          where: { id: course_id },
+          include: [
+            {
+              model: Lesson,
+              as: "lessons",
+            },
           ],
-          transaction:t
+          order: [
+            [{ model: Lesson, as: "lessons" }, "order", "ASC"],
+            [{ model: Lesson, as: "lessons" }, "createdAt", "ASC"],
+          ],
+          transaction: t,
         };
         const result = await CourseService.fetchCourse(filter);
-        if(!result)return res.json(result);
+        if (!result) return res.json(result);
         const [mapped_result] = await mapCourseImage([result]);
         return res.json(mapped_result);
       });

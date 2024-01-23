@@ -35,7 +35,7 @@ import { IncludeOptions } from "sequelize";
 export default {
   registerUser: async (
     req: Request<{}, {}, PersonCreationAttributes>,
-    res: Response<IResponse<UserResponse>, {}>,
+    res: Response,
     next: NextFunction
   ) => {
     try {
@@ -95,7 +95,7 @@ export default {
         }
         await user.$add("role", role, { transaction: t });
 
-        // await sendEmail(mailOptions);
+        await sendEmail(mailOptions);
         const access_token = issueToken(
           { sub: user.id, email: user.email! },
           config.ACCESS_TOKEN_SECRET,
@@ -128,7 +128,7 @@ export default {
             secure: true,
             httpOnly: true,
           })
-          .json({ data: mapUserRole(user,profile_url),success: true });
+          .json(mapUserRole(user,profile_url));
       });
     } catch (err) {
       next(err);
@@ -137,7 +137,8 @@ export default {
 
   loginUser: async (
     req: Request<{}, {}, ILogin>,
-    res: Response<IResponse<UserResponse>, {}>,
+    // <IResponse<UserResponse>>
+    res: Response,
     next: NextFunction
   ) => {
     try {
@@ -173,7 +174,7 @@ export default {
               secure: true,
               httpOnly: true,
             })
-            .json({ data: mapUserRole(user,profile_url),success: true });
+            .json(mapUserRole(user,profile_url));
         }
         handleError("Username or Password Incorrect", 401);
       }

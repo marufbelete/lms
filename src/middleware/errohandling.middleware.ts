@@ -14,7 +14,7 @@ export const errorHandler = (
   //     },
   //   });
   // }
-console.log(err)
+  console.log(err);
   const statusCode = err.status || 500;
   const errorMessage = err.message || "Internal Server Error";
   return res.status(statusCode).json({
