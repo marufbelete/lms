@@ -88,10 +88,12 @@ export default {
         const user = await UserService.insertUser(user_to_add, {
           transaction: t,
         });
-        const role_filter:IncludeOptions = role_id ? { where:{ id: role_id }} : { where:{ name: ROLE.STUDENT }};
+        const role_filter: IncludeOptions = role_id
+          ? { where: { id: role_id } }
+          : { where: { name: ROLE.STUDENT } };
         const role = await RoleService.fetchRole(role_filter);
-        if(!role){
-          return handleError("role not found",404)
+        if (!role) {
+          return handleError("role not found", 404);
         }
         await user.$add("role", role, { transaction: t });
 
@@ -123,12 +125,12 @@ export default {
         return res
           .status(201)
           .cookie("access_token", access_token, {
-            sameSite: "none",
+            // sameSite: "none",
             path: "/",
             secure: true,
             httpOnly: true,
           })
-          .json(mapUserRole(user,profile_url));
+          .json(mapUserRole(user, profile_url));
       });
     } catch (err) {
       next(err);
@@ -163,18 +165,18 @@ export default {
                 config.ACCESS_TOKEN_SECRET,
                 { expiresIn: config.ACCESS_TOKEN_EXPIRES }
               );
-          let profile_url
-          if(user.avatar)profile_url= await getImage(user.avatar)
+          let profile_url;
+          if (user.avatar) profile_url = await getImage(user.avatar);
           bouncer.reset(req);
           return res
             .status(200)
             .cookie("access_token", access_token, {
-              sameSite: "none",
+              // sameSite: "none",
               path: "/",
               secure: true,
               httpOnly: true,
             })
-            .json(mapUserRole(user,profile_url));
+            .json(mapUserRole(user, profile_url));
         }
         handleError("Username or Password Incorrect", 401);
       }
@@ -205,7 +207,7 @@ export default {
       return res
         .status(200)
         .clearCookie("access_token", {
-          sameSite: "none",
+          // sameSite: "none",
           path: "/",
           secure: true,
           httpOnly: true,
@@ -223,12 +225,12 @@ export default {
       const { verifyToken } = req.query as { verifyToken: string };
       const user = await isTokenValid(verifyToken, config.ACCESS_TOKEN_SECRET);
       if (user) {
-        const filter:IncludeOptions = { where: { id: user?.sub } };
+        const filter: IncludeOptions = { where: { id: user?.sub } };
         const userInfo = await UserService.fetchUser(filter, {
           scope: "user_role_state",
         });
-        if(!userInfo){
-          return handleError("user not found",404)
+        if (!userInfo) {
+          return handleError("user not found", 404);
         }
         userInfo.is_email_confirmed = true;
 
@@ -242,7 +244,7 @@ export default {
         return res
           .status(200)
           .cookie("access_token", access_token, {
-            sameSite: "none",
+            // sameSite: "none",
             path: "/",
             secure: true,
             httpOnly: true,
@@ -304,7 +306,7 @@ export default {
       if (user && user?.avatar) {
         profile_url = await getImage(user?.avatar);
       }
-      return res.status(200).json(mapUserRole(user,profile_url));
+      return res.status(200).json(mapUserRole(user, profile_url));
     } catch (err) {
       next(err);
     }

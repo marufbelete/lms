@@ -94,7 +94,7 @@ export default {
       if (user && user?.avatar) {
         profile_url = await getImage(user?.avatar);
       }
-      return res.status(200).json(mapUserRole(user,profile_url));
+      return res.status(200).json(mapUserRole(user, profile_url));
     } catch (err) {
       next(err);
     }

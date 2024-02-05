@@ -64,7 +64,6 @@ export const userIp = (request: Request) => {
 };
 
 export const mapUserRole = (user: User, image?: string) => {
-  console.log(user);
   const transformedObject = {
     ...user.dataValues,
     image: image,
