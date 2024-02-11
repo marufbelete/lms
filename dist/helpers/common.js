@@ -44,7 +44,7 @@ const mapUserExerciseInfo = (exercise_info) => {
             is_completed: item.exercise_users[0].is_completed,
             step_validation: item.step_validation,
             createdAt: item.createdAt,
-            updatedAt: item.updatedAt
+            updatedAt: item.updatedAt,
         };
     });
     return maped_data;
@@ -53,8 +53,8 @@ exports.mapUserExerciseInfo = mapUserExerciseInfo;
 const lessonMaxWeightFilter = (course_id) => {
     const filter = {
         where: {
-            courseId: course_id
-        }
+            courseId: course_id,
+        },
     };
     return filter;
 };
@@ -63,10 +63,10 @@ const lessonMaxWeightUpdateFilter = (course_id, lesson_id) => {
     const filter = {
         where: {
             id: {
-                [sequelize_1.Op.ne]: lesson_id
+                [sequelize_1.Op.ne]: lesson_id,
             },
-            courseId: course_id
-        }
+            courseId: course_id,
+        },
     };
     return filter;
 };
@@ -74,8 +74,8 @@ exports.lessonMaxWeightUpdateFilter = lessonMaxWeightUpdateFilter;
 const exerciseMaxWeightFilter = (lesson_id) => {
     const filter = {
         where: {
-            lessonId: lesson_id
-        }
+            lessonId: lesson_id,
+        },
     };
     return filter;
 };
@@ -84,10 +84,10 @@ const exerciseMaxWeightUpdateFilter = (exercise_id, lesson_id) => {
     const filter = {
         where: {
             id: {
-                [sequelize_1.Op.ne]: exercise_id
+                [sequelize_1.Op.ne]: exercise_id,
             },
-            lessonId: lesson_id
-        }
+            lessonId: lesson_id,
+        },
     };
     return filter;
 };
@@ -158,7 +158,7 @@ const mapCourseCompleted = (prereq) => {
         id: course.id,
         title: course === null || course === void 0 ? void 0 : course.title,
         description: course === null || course === void 0 ? void 0 : course.description,
-        is_completed: course.course_users[0].is_completed || false
+        is_completed: course.course_users[0].is_completed || false,
     }));
     return mapped_course;
 };

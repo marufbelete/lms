@@ -58,6 +58,6 @@ exports.validateUpdateExerciseInput = validateUpdateExerciseInput;
 exports.completeExerciseSchema = joi_1.default.object({
     exercise_id: joi_1.default.any().required(),
     type: joi_1.default.any().required(),
-    input: joi_1.default.string().required()
+    input: joi_1.default.string().required(),
 });
 //# sourceMappingURL=exercise.validation.js.map

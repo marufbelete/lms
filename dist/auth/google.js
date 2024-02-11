@@ -33,26 +33,24 @@ const googleStrategy = new GoogleStrategy({
                 first_name: profile._json.given_name,
                 last_name: profile._json.family_name,
                 google_id: profile._json.sub,
-                is_email_confirmed: profile._json.email_verified === "true" ? true : false
+                is_email_confirmed: profile._json.email_verified === "true" ? true : false,
             };
             const [user, created] = yield user_model_1.User.findOrCreate({
                 where: {
-                    [sequelize_1.Op.or]: [
-                        { google_id: userInfo.google_id },
-                    ],
+                    [sequelize_1.Op.or]: [{ google_id: userInfo.google_id }],
                 },
                 defaults: userInfo,
             });
             if (created) {
                 const role = yield index_service_1.RoleService.fetchRole({
                     where: {
-                        name: role_1.ROLE.STUDENT
-                    }
+                        name: role_1.ROLE.STUDENT,
+                    },
                 });
                 if (!role) {
                     return (0, handleError_1.handleError)("default role found", 404);
                 }
-                yield user.$add('role', role);
+                yield user.$add("role", role);
             }
             done(null, user);
         }

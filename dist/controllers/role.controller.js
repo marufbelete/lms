@@ -43,8 +43,8 @@ exports.default = {
             const param = req.body;
             const filter = {
                 where: {
-                    id
-                }
+                    id,
+                },
             };
             const { error } = role_validation_1.updateRoleSchema.validate(Object.assign({ id }, param));
             if (error) {
@@ -65,7 +65,7 @@ exports.default = {
                 (0, handleError_1.handleError)(error.message, 403);
             }
             const filter = {
-                where: { id }
+                where: { id },
             };
             const result = yield index_service_1.RoleService.fetchRole(filter);
             return res.json(result);
@@ -83,8 +83,8 @@ exports.default = {
             }
             const filter = {
                 where: {
-                    id
-                }
+                    id,
+                },
             };
             const result = yield index_service_1.RoleService.removeRole(filter);
             return res.json(result);
@@ -92,6 +92,6 @@ exports.default = {
         catch (error) {
             next(error);
         }
-    })
+    }),
 };
 //# sourceMappingURL=role.controller.js.map

@@ -16,11 +16,14 @@ const models_1 = __importDefault(require("../models/"));
 const config_1 = __importDefault(require("../config/config"));
 const Server = (app) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        models_1.default.authenticate().then(() => __awaiter(void 0, void 0, void 0, function* () {
+        models_1.default
+            .authenticate()
+            .then(() => __awaiter(void 0, void 0, void 0, function* () {
             app.listen(config_1.default.PORT || 7000, () => {
                 console.log(`Server is running on port ${config_1.default.PORT}.`);
             });
-        })).catch(error => {
+        }))
+            .catch((error) => {
             console.log(error);
         });
     }

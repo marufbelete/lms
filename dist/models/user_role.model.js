@@ -29,7 +29,7 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
     }),
     __metadata("design:type", Boolean)
 ], User_Role.prototype, "is_active", void 0);
@@ -54,7 +54,7 @@ __decorate([
 exports.User_Role = User_Role = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.USER_ROLE,
-        modelName: 'user_role'
+        modelName: "user_role",
     })
 ], User_Role);
 //# sourceMappingURL=user_role.model.js.map

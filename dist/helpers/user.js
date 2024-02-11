@@ -18,8 +18,8 @@ const argon2_1 = require("argon2");
 const index_service_1 = require("../service/index.service");
 const isEmailExist = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield index_service_1.UserService.fetchUser({
-        where: { email: email }
-    }, { scope: 'user_role_state' });
+        where: { email: email },
+    }, { scope: "user_role_state" });
     return user;
 });
 exports.isEmailExist = isEmailExist;
@@ -50,7 +50,9 @@ const isEmailVerified = (filter) => __awaiter(void 0, void 0, void 0, function* 
 exports.isEmailVerified = isEmailVerified;
 const getLoggedUser = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const { sub } = req.user;
-    const user = yield index_service_1.UserService.fetchUserById(sub, { scope: 'user_role_state' });
+    const user = yield index_service_1.UserService.fetchUserById(sub, {
+        scope: "user_role_state",
+    });
     return user;
 });
 exports.getLoggedUser = getLoggedUser;
@@ -61,13 +63,12 @@ const userIp = (request) => {
 exports.userIp = userIp;
 const mapUserRole = (user, image) => {
     var _a;
-    console.log(user);
-    const transformedObject = Object.assign(Object.assign({}, user.dataValues), { image: image, roles: (_a = user.roles) === null || _a === void 0 ? void 0 : _a.map(role => {
+    const transformedObject = Object.assign(Object.assign({}, user.dataValues), { image: image, roles: (_a = user.roles) === null || _a === void 0 ? void 0 : _a.map((role) => {
             var _a;
             return ({
                 id: role.id,
                 name: role.name,
-                is_active: ((_a = role.user_role) === null || _a === void 0 ? void 0 : _a.is_active) || false
+                is_active: ((_a = role.user_role) === null || _a === void 0 ? void 0 : _a.is_active) || false,
             });
         }) });
     delete transformedObject.password;

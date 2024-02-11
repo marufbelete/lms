@@ -7,11 +7,11 @@ exports.updateCollectionSchema = exports.addCollectionSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.addCollectionSchema = joi_1.default.object({
     title: joi_1.default.string().required(),
-    description: joi_1.default.any()
+    description: joi_1.default.any(),
 });
 exports.updateCollectionSchema = joi_1.default.object({
     id: joi_1.default.any().required(),
     title: joi_1.default.string().required(),
-    description: joi_1.default.any()
+    description: joi_1.default.any(),
 });
 //# sourceMappingURL=collection.validation.js.map

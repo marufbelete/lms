@@ -31,14 +31,14 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,
-        defaultValue: false
+        defaultValue: false,
     }),
     __metadata("design:type", Boolean)
 ], Course_User.prototype, "is_started", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,
-        defaultValue: false
+        defaultValue: false,
     }),
     __metadata("design:type", Boolean)
 ], Course_User.prototype, "is_completed", void 0);
@@ -76,7 +76,7 @@ __decorate([
 exports.Course_User = Course_User = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.COURSE_USER,
-        modelName: 'course_user'
+        modelName: "course_user",
     })
 ], Course_User);
 //# sourceMappingURL=course_user.model.js.map

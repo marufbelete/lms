@@ -23,9 +23,7 @@ import sequelize from "../models";
 import { Request, Response, NextFunction } from "express";
 import {
   ILogin,
-  IResponse,
-  PersonCreationAttributes,
-  UserResponse,
+  PersonCreationAttributes
 } from "../types";
 import { Role } from "../models/role.model";
 import { getImage, saveImage } from "../helpers/file";
@@ -39,17 +37,26 @@ export default {
     next: NextFunction
   ) => {
     try {
-      return await sequelize.transaction(async (t) => {
-        const { email, password, role_id, username } = req.body;
-        const { error } = signupUserSchema.validate({
-          ...req.body,
-        });
-        if (error) {
-          handleError(error.message, 400);
-        }
-
-        const token = issueToken({ email: email! }, config.ACCESS_TOKEN_SECRET);
-        const mailOptions = accountConfirmationEmail(email!, username!, token);
+      const { email, password, role_id, username } = req.body;
+      const { error } = signupUserSchema.validate({
+        ...req.body,
+      });
+      if (error) {
+        handleError(error.message, 400);
+      }
+      const hashedPassword = await hashPassword(password!);
+      const user_to_add = {
+        ...req.body,
+        is_local_auth: true,
+        password: hashedPassword,
+      };
+      let profile_url: string;
+      if (req.file) {
+        const key = await saveImage(req.file, config.AWS_PROFILE_FOLDER);
+        profile_url = await getImage(key);
+        user_to_add.avatar = key;
+      }
+      await sequelize.transaction(async (t) => {
         // if (await isEmailExist(email)) {
         //   if (await isEmailVerified({where:{ email }})) {
         //     handleError("User already exists with this email", 400);
@@ -72,18 +79,6 @@ export default {
         //     return res.json({ success: true, info });
         //   }
         // }
-        const hashedPassword = await hashPassword(password!);
-        const user_to_add = {
-          ...req.body,
-          is_local_auth: true,
-          password: hashedPassword,
-        };
-        let profile_url;
-        if (req.file) {
-          const key = await saveImage(req.file, config.AWS_PROFILE_FOLDER);
-          profile_url = await getImage(key);
-          user_to_add.avatar = key;
-        }
 
         const user = await UserService.insertUser(user_to_add, {
           transaction: t,
@@ -96,13 +91,20 @@ export default {
           return handleError("role not found", 404);
         }
         await user.$add("role", role, { transaction: t });
-
-        await sendEmail(mailOptions);
         const access_token = issueToken(
           { sub: user.id, email: user.email! },
           config.ACCESS_TOKEN_SECRET,
           { expiresIn: config.ACCESS_TOKEN_EXPIRES }
         );
+        await user.reload({
+          include: [
+            {
+              model: Role,
+              through: { attributes: ["is_active"] },
+            },
+          ],
+          transaction: t,
+        });
         // const user_roles = await user.$get('roles',{transaction: t });
         // console.log(user_roles)
         // console.log(user_roles[0].user_role)
@@ -113,15 +115,6 @@ export default {
         // console.log(user_roles[0].user_roles);
         // console.log(user_roles[0].user_role);
 
-        await user.reload({
-          include: [
-            {
-              model: Role,
-              through: { attributes: ["is_active"] },
-            },
-          ],
-          transaction: t,
-        });
         return res
           .status(201)
           .cookie("access_token", access_token, {
@@ -132,6 +125,10 @@ export default {
           })
           .json(mapUserRole(user, profile_url));
       });
+      const token = issueToken({ email: email! }, config.ACCESS_TOKEN_SECRET);
+      const mailOptions = accountConfirmationEmail(email!, username!, token);
+      sendEmail(mailOptions);
+      return;
     } catch (err) {
       next(err);
     }

@@ -32,13 +32,13 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false
+        allowNull: false,
     }),
     __metadata("design:type", String)
 ], Lesson.prototype, "title", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
+        type: sequelize_typescript_1.DataType.STRING,
     }),
     __metadata("design:type", String)
 ], Lesson.prototype, "description", void 0);
@@ -52,7 +52,7 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: true
+        allowNull: true,
     }),
     __metadata("design:type", Number)
 ], Lesson.prototype, "order", void 0);
@@ -84,7 +84,7 @@ __decorate([
 exports.Lesson = Lesson = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.LESSON,
-        modelName: 'lesson'
+        modelName: "lesson",
     })
 ], Lesson);
 //# sourceMappingURL=lesson.model.js.map

@@ -63,9 +63,9 @@ __decorate([
 exports.StepValidation = StepValidation = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.STEP_VALIDATION,
-        modelName: 'step_validation',
+        modelName: "step_validation",
         createdAt: "created_at",
-        updatedAt: "updated_at"
+        updatedAt: "updated_at",
     })
 ], StepValidation);
 //# sourceMappingURL=step_validation.model.js.map

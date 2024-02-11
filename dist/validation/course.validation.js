@@ -12,7 +12,7 @@ exports.addCourseSchema = joi_1.default.object({
     estimatedTime: joi_1.default.string(),
     difficulty: joi_1.default.string(),
     collectionId: joi_1.default.string(),
-    prerequisiteIds: joi_1.default.array()
+    prerequisiteIds: joi_1.default.array(),
 });
 exports.updateCourseSchema = joi_1.default.object({
     id: joi_1.default.any().required(),
@@ -22,6 +22,6 @@ exports.updateCourseSchema = joi_1.default.object({
     estimatedTime: joi_1.default.string(),
     difficulty: joi_1.default.string(),
     collectionId: joi_1.default.string(),
-    prerequisiteIds: joi_1.default.array()
+    prerequisiteIds: joi_1.default.array(),
 });
 //# sourceMappingURL=course.validation.js.map

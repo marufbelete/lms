@@ -27,6 +27,6 @@ route.use("/google/callback", passport_1.default.authenticate("google", {
     failureRedirect: `${config_1.default.FE_URL}/login`,
 }), google_1.issueGoogleToken, errohandling_middleware_1.errorHandler);
 route.post("/logout", auth_controller_1.default.logoutUser, errohandling_middleware_1.errorHandler);
-route.get("/confirm", auth_controller_1.default.confirmEmail, errohandling_middleware_1.errorHandler);
+route.post("/confirm", auth_controller_1.default.confirmEmail, errohandling_middleware_1.errorHandler);
 exports.default = route;
 //# sourceMappingURL=auth.route.js.map

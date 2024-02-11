@@ -24,6 +24,6 @@ passport_1.default.deserializeUser(function (id, done) {
         return done(null, user);
     });
 });
-passport_1.default.use('google', google_1.googleStrategy);
+passport_1.default.use("google", google_1.googleStrategy);
 exports.default = passport_1.default;
 //# sourceMappingURL=passport.js.map

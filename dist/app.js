@@ -14,19 +14,19 @@ const server_1 = __importDefault(require("./config/server"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: [
-        'http://localhost:3000',
-        'https://sorobanlearn.com',
-        /\.netlify.app$/
+        "http://localhost:3000",
+        "https://sorobanlearn.com",
+        /\.netlify.app$/,
     ],
-    credentials: true
+    credentials: true,
 }));
 app.use((0, cookie_parser_1.default)());
 // app.use(helmet());
 app.use(passport_1.default.initialize());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
-app.use(express_1.default.static('public'));
-app.use('/api', index_1.default);
+app.use(express_1.default.static("public"));
+app.use("/api", index_1.default);
 (0, server_1.default)(app);
 exports.default = app;
 //# sourceMappingURL=app.js.map

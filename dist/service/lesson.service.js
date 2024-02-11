@@ -55,7 +55,7 @@ class LessonService {
     //update in future
     static getLessonMaxWeightToAssign(filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield lesson_model_1.Lesson.sum('weight', filter);
+            const result = yield lesson_model_1.Lesson.sum("weight", filter);
             return common_1.WEIGHT.MAX - result;
         });
     }
@@ -64,9 +64,9 @@ class LessonService {
             const leastOrderLesson = yield this.fetchLesson({
                 where: {
                     courseId: course_id,
-                    order: { [sequelize_1.Op.gt]: order_value }
+                    order: { [sequelize_1.Op.gt]: order_value },
                 },
-                order: [['order', 'ASC']],
+                order: [["order", "ASC"]],
             });
             return leastOrderLesson;
         });

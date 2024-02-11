@@ -32,17 +32,27 @@ exports.default = {
                 if (error) {
                     (0, handleError_1.handleError)(error.message, 403);
                 }
-                const lesson = yield index_service_1.LessonService.insertLesson(param, { transaction: t });
-                const course = yield index_service_1.CourseService.fetchCourse({ where: { id: course_id } });
+                const lesson = yield index_service_1.LessonService.insertLesson(param, {
+                    transaction: t,
+                });
+                const course = yield index_service_1.CourseService.fetchCourse({
+                    where: { id: course_id },
+                });
                 if (!course) {
                     return (0, handleError_1.handleError)("course does not exist", 403);
                 }
-                yield course.$add('lesson', lesson, { transaction: t });
+                yield course.$add("lesson", lesson, { transaction: t });
                 //add to existing user
-                const course_takers = yield course_user_model_1.Course_User.findAll({ where: { courseId: course_id }, include: { model: user_model_1.User } });
+                const course_takers = yield course_user_model_1.Course_User.findAll({
+                    where: { courseId: course_id },
+                    include: { model: user_model_1.User },
+                });
                 if (course_takers.length > 0) {
                     for (const course_taker of course_takers) {
-                        yield ((_a = course_taker.user) === null || _a === void 0 ? void 0 : _a.$add('lesson', lesson, { through: { courseUserId: course_taker.id }, transaction: t }));
+                        yield ((_a = course_taker.user) === null || _a === void 0 ? void 0 : _a.$add("lesson", lesson, {
+                            through: { courseUserId: course_taker.id },
+                            transaction: t,
+                        }));
                     }
                 }
                 yield lesson.reload({ transaction: t });
@@ -60,12 +70,12 @@ exports.default = {
             const { course_id } = req.params;
             const filter = {
                 where: {
-                    courseId: course_id
+                    courseId: course_id,
                 },
                 include: [],
                 order: [
-                    ['order', 'ASC'],
-                    ['createdAt', 'ASC']
+                    ["order", "ASC"],
+                    ["createdAt", "ASC"],
                 ],
             };
             if (course) {
@@ -74,9 +84,9 @@ exports.default = {
                 });
             }
             if (exercise) {
-                filter.order.push([{ model: exercise_model_1.Exercise, as: 'exercises' }, 'order', 'ASC'], [{ model: exercise_model_1.Exercise, as: 'exercises' }, 'createdAt', 'ASC']);
+                filter.order.push([{ model: exercise_model_1.Exercise, as: "exercises" }, "order", "ASC"], [{ model: exercise_model_1.Exercise, as: "exercises" }, "createdAt", "ASC"]);
                 filter.include.push({
-                    model: exercise_model_1.Exercise
+                    model: exercise_model_1.Exercise,
                 });
             }
             const result = yield index_service_1.LessonService.fetchLessons(filter);
@@ -92,10 +102,12 @@ exports.default = {
             const param = req.body;
             const filter = {
                 where: {
-                    id: lesson_id
-                }
+                    id: lesson_id,
+                },
             };
-            const lesson = yield index_service_1.LessonService.fetchLesson({ where: { id: lesson_id } });
+            const lesson = yield index_service_1.LessonService.fetchLesson({
+                where: { id: lesson_id },
+            });
             if (!lesson) {
                 return (0, handleError_1.handleError)("lesson not found", 404);
             }
@@ -120,20 +132,20 @@ exports.default = {
             }
             const filter = {
                 where: { id: lesson_id },
-                include: []
+                include: [],
             };
             if (course) {
                 filter.include.push({
-                    model: course_model_1.Course
+                    model: course_model_1.Course,
                 });
             }
             if (exercise) {
                 filter.order = [
-                    [{ model: exercise_model_1.Exercise, as: 'exercises' }, 'order', 'ASC'],
-                    [{ model: exercise_model_1.Exercise, as: 'exercises' }, 'createdAt', 'ASC']
+                    [{ model: exercise_model_1.Exercise, as: "exercises" }, "order", "ASC"],
+                    [{ model: exercise_model_1.Exercise, as: "exercises" }, "createdAt", "ASC"],
                 ];
                 filter.include.push({
-                    model: exercise_model_1.Exercise
+                    model: exercise_model_1.Exercise,
                 });
             }
             const result = yield index_service_1.LessonService.fetchLesson(filter);
@@ -152,8 +164,8 @@ exports.default = {
             }
             const filter = {
                 where: {
-                    id: lesson_id
-                }
+                    id: lesson_id,
+                },
             };
             const result = yield index_service_1.LessonService.removeLesson(filter);
             return res.json(result);
@@ -161,6 +173,6 @@ exports.default = {
         catch (error) {
             next(error);
         }
-    })
+    }),
 };
 //# sourceMappingURL=lesson.controller.js.map

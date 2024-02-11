@@ -97,53 +97,54 @@ export default {
     next: NextFunction
   ) => {
     try {
+      const { id: user_id } = req.params;
+      const { course_id } = req.body;
+      const { error } = courseToUserSchema.validate({
+        user_id,
+        course_id,
+      });
+      if (error) {
+        handleError(error.message, 403);
+      }
+      const user = await UserService.fetchUserById(user_id);
+      if (!user) {
+        return handleError("user does not exist", 403);
+      }
+      const existing_user_courses = await user?.$get("courses");
+      if (existing_user_courses?.find((e) => e.id === course_id)) {
+        handleError("This user already registerd for the course", 403);
+      }
+      const course = await CourseService.fetchCourse({
+        where: { id: course_id },
+        include: [
+          {
+            model: Lesson,
+            include: [
+              {
+                model: Lesson_User,
+              },
+              {
+                model: Exercise,
+              },
+            ],
+          },
+        ],
+      });
+      if (!course) {
+        return handleError("Course not exist", 403);
+      }
+      const leastOrderLesson = await LessonService.fetchLesson({
+        where: { courseId: course_id },
+        order: [
+          ["order", "ASC"],
+          ["createdAt", "ASC"],
+        ],
+      });
+      if (!leastOrderLesson) {
+        return handleError("lesson to start not found", 404);
+      }
+
       return await sequelize.transaction(async (t) => {
-        const { id: user_id } = req.params;
-        const { course_id } = req.body;
-        const { error } = courseToUserSchema.validate({
-          user_id,
-          course_id,
-        });
-        if (error) {
-          handleError(error.message, 403);
-        }
-        const user = await UserService.fetchUserById(user_id);
-        if (!user) {
-          return handleError("user does not exist", 403);
-        }
-        const existing_user_courses = await user?.$get("courses");
-        if (existing_user_courses?.find((e) => e.id === course_id)) {
-          handleError("This user already registerd for the course", 403);
-        }
-        const course = await CourseService.fetchCourse({
-          where: { id: course_id },
-          include: [
-            {
-              model: Lesson,
-              include: [
-                {
-                  model: Lesson_User,
-                },
-                {
-                  model: Exercise,
-                },
-              ],
-            },
-          ],
-        });
-        if (!course) {
-          return handleError("Course not exist", 403);
-        }
-        const leastOrderLesson = await LessonService.fetchLesson({
-          where: { courseId: course_id },
-          order: [
-            ["order", "ASC"],
-            ["createdAt", "ASC"],
-          ],
-        });
-        if (!leastOrderLesson) {
-          return handleError("lesson to start not found", 404);
-        }
         const [course_user] = (await user.$add("course", course, {
           through: { currentLessonId: leastOrderLesson.id },
           transaction: t,

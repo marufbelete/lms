@@ -31,13 +31,13 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false
+        allowNull: false,
     }),
     __metadata("design:type", String)
 ], Exercise.prototype, "title", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
+        type: sequelize_typescript_1.DataType.STRING,
     }),
     __metadata("design:type", String)
 ], Exercise.prototype, "description", void 0);
@@ -57,7 +57,7 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: true
+        allowNull: true,
     }),
     __metadata("design:type", Number)
 ], Exercise.prototype, "order", void 0);
@@ -85,7 +85,7 @@ __decorate([
 exports.Exercise = Exercise = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.EXERCISE,
-        modelName: 'exercise'
+        modelName: "exercise",
     })
 ], Exercise);
 //# sourceMappingURL=exercise.model.js.map

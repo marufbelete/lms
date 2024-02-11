@@ -20,8 +20,11 @@ const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 const client_s3_1 = require("@aws-sdk/client-s3");
 const s3_config_1 = __importDefault(require("../config/s3-config"));
 const config_1 = __importDefault(require("../config/config"));
-const fileStorage = multer_1.default.memoryStorage();
-exports.uploadImage = (0, multer_1.default)({ storage: fileStorage, fileFilter: sanitizeImage });
+const storage = multer_1.default.memoryStorage();
+exports.uploadImage = (0, multer_1.default)({
+    storage: storage,
+    fileFilter: sanitizeImage,
+});
 const saveImage = (file, folder) => __awaiter(void 0, void 0, void 0, function* () {
     const uniquePrefix = Date.now();
     const imagetype = file.mimetype.split("/")[1];
@@ -32,9 +35,8 @@ const saveImage = (file, folder) => __awaiter(void 0, void 0, void 0, function* 
         Key: fullpath,
         Body: yield (0, sharp_1.default)(file.buffer)
             .resize({ width: 400, fit: "contain" })
-            .toFormat(imagetype)
             .toBuffer(),
-        ContentType: imagetype
+        ContentType: imagetype,
     };
     yield s3_config_1.default.send(new client_s3_1.PutObjectCommand(params));
     return fullpath;
@@ -53,9 +55,8 @@ const saveImages = (files, folder) => __awaiter(void 0, void 0, void 0, function
             Key: fullpath,
             Body: yield (0, sharp_1.default)(files[f].buffer)
                 .resize({ width: 400, fit: "contain" })
-                .toFormat(imagetype)
                 .toBuffer(),
-            ContentType: imagetype
+            ContentType: imagetype,
         };
         yield s3_config_1.default.send(new client_s3_1.PutObjectCommand(params));
     }
@@ -65,7 +66,7 @@ exports.saveImages = saveImages;
 const getImage = (key) => __awaiter(void 0, void 0, void 0, function* () {
     const params = {
         Bucket: config_1.default.AWS_BUCKET_NAME,
-        Key: key
+        Key: key,
     };
     const command = new client_s3_1.GetObjectCommand(params);
     const url = yield (0, s3_request_presigner_1.getSignedUrl)(s3_config_1.default, command, { expiresIn: 36000 });
@@ -87,7 +88,7 @@ function sanitizeImage(req, file, cb) {
     const isAllowedExt = fileExts.includes(path_1.default.extname(file.originalname.toLowerCase()));
     const isAllowedMimeType = file.mimetype.startsWith("image/");
     if (isAllowedExt && isAllowedMimeType) {
-        return cb(null, true); // no errors 
+        return cb(null, true); // no errors
     }
     else {
         cb("Error: File type not allowed!");

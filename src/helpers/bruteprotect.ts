@@ -81,9 +81,6 @@ class Bouncer {
       remaining / 60000
     )} minutes`,
   });
-    // res.status(429).send(
-    //   `Too many requests have been made, please wait ${remaining / 1000} seconds`
-    // );
   }
 }
 

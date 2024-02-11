@@ -1,15 +1,12 @@
 import sequelize from "../models";
-import { getByIdSchema } from "../validation/common.validation";
 import config from "../config/config";
 import { Request, Response, NextFunction } from "express";
 import { Course } from "../models/course.model";
 import {
   mapCollectionCourseImage,
-  mapCourseCompleted,
   mapCourseImage,
   mapCourseUserInfo,
   mapUserExerciseInfo,
-  paginate,
 } from "../helpers/common";
 import {
   courseToLoggedUserSchema,
@@ -32,11 +29,8 @@ import { Exercise_User } from "../models/exercise_user.model";
 import { StepValidation } from "../models/step_validation.model";
 import { Course_User } from "../models/course_user.model";
 import {
-  IResponse,
   IncludeOptionsWithTransaction,
-  UserResponse,
 } from "../types";
-import { User } from "../models/user.model";
 import { IncludeOptions } from "sequelize";
 
 export default {
@@ -106,42 +100,41 @@ export default {
     next: NextFunction
   ) => {
     try {
+      const { course_id } = req.body as { course_id: string };
+      const { error } = courseToLoggedUserSchema.validate({
+        course_id,
+      });
+      if (error) {
+        handleError(error.message, 400);
+      }
+      const user = await getLoggedUser(req);
+      if (!user) {
+        return handleError("user not exist", 404);
+      }
+      const existing_user_courses = await user.$get("courses");
+      if (existing_user_courses?.find((e) => e.id === course_id)) {
+        handleError("This user already registerd for the course", 403);
+      }
+      const course = await CourseService.fetchCourse({
+        where: { id: course_id },
+        include: [
+          {
+            model: Lesson,
+            include: [
+              {
+                model: Lesson_User,
+              },
+              {
+                model: Exercise,
+              },
+            ],
+          },
+        ],
+      });
+      if (!course) {
+        return handleError("Course not exist", 404);
+      }
       return await sequelize.transaction(async (t) => {
-        const { course_id } = req.body as { course_id: string };
-        const { error } = courseToLoggedUserSchema.validate({
-          course_id,
-        });
-        if (error) {
-          handleError(error.message, 400);
-        }
-        const user = await getLoggedUser(req);
-        if (!user) {
-          return handleError("user not exist", 404);
-        }
-        const existing_user_courses = await user.$get("courses");
-        if (existing_user_courses?.find((e) => e.id === course_id)) {
-          handleError("This user already registerd for the course", 403);
-        }
-        const course = await CourseService.fetchCourse({
-          where: { id: course_id },
-          include: [
-            {
-              model: Lesson,
-              include: [
-                {
-                  model: Lesson_User,
-                },
-                {
-                  model: Exercise,
-                },
-              ],
-            },
-          ],
-        });
-        if (!course) {
-          return handleError("Course not exist", 404);
-        }
-
         const [course_user] = (await user?.$add("course", course, {
           transaction: t,
         })) as Course_User[];
@@ -172,47 +165,47 @@ export default {
 
   startCourse: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { course_id, force } = req.body;
+      const user = await getLoggedUser(req);
+      if (!user) {
+        return handleError("user does not exist", 404);
+      }
+      if (!force) {
+        const prereq_info = await CourseService.coursePrerequisiteNotCompleted(
+          course_id,
+          user.id
+        );
+        if (
+          prereq_info &&
+          prereq_info.prereq &&
+          prereq_info.prereq.length > 0
+        ) {
+          return res.status(403).json({
+            message:
+              "Would you like to continue without completing the prerequisite course?",
+            data: prereq_info,
+            status: false,
+          });
+        }
+      }
+      const leastOrderLesson = await LessonService.fetchLesson({
+        where: { courseId: course_id },
+        order: [
+          ["order", "ASC"],
+          ["createdAt", "ASC"],
+        ],
+      });
+      if (!leastOrderLesson) {
+        return handleError("unable to find the lesson", 404);
+      }
+
       return await sequelize.transaction(async (t) => {
-        const { course_id, force } = req.body;
-        const user = await getLoggedUser(req);
-        if (!user) {
-          return handleError("user does not exist", 404);
-        }
-        if (!force) {
-          const prereq_info =
-            await CourseService.coursePrerequisiteNotCompleted(
-              course_id,
-              user.id
-            );
-          if (
-            prereq_info &&
-            prereq_info.prereq &&
-            prereq_info.prereq.length > 0
-          ) {
-            return res.status(403).json({
-              message:
-                "Would you like to continue without completing the prerequisite course?",
-              data: prereq_info,
-              status: false,
-            });
-          }
-        }
-        const leastOrderLesson = await LessonService.fetchLesson({
-          where: { courseId: course_id },
-          order: [
-            ["order", "ASC"],
-            ["createdAt", "ASC"],
-          ],
-        });
-        if (!leastOrderLesson) {
-          return handleError("unable to find the lesson", 404);
-        }
         await CourseService.editCourseUser(
           {
             currentLessonId: leastOrderLesson.id,
             is_started: true,
           },
-          { where: { userId: user?.id, courseId: course_id } }
+          { where: { userId: user?.id, courseId: course_id }, transaction: t }
         );
         await LessonService.editLessonUser(
           { is_started: true },

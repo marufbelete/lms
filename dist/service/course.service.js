@@ -60,7 +60,7 @@ class CourseService {
     static currentLesson(userId, courseId) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield course_user_model_1.Course_User.findOne({
-                where: { userId, courseId }
+                where: { userId, courseId },
             });
             return result;
         });
@@ -88,12 +88,14 @@ class CourseService {
             const filter = {
                 where: { id: course_id },
                 // attributes:[],
-                include: [{
+                include: [
+                    {
                         model: course_model_1.Course,
-                        as: 'prereq',
-                        attributes: ['id', 'title', 'description'],
-                        through: { attributes: [] }
-                    }]
+                        as: "prereq",
+                        attributes: ["id", "title", "description"],
+                        through: { attributes: [] },
+                    },
+                ],
             };
             return yield this.fetchCourse(filter);
         });

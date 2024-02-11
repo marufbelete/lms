@@ -29,17 +29,16 @@ export default {
     next: NextFunction
   ) => {
     try {
+      const param = req.body;
+      const { lesson_id } = req.params;
+      const { error } = await validateAddExerciseInput({
+        ...param,
+        lesson_id,
+      });
+      if (error) {
+        handleError(error.message, 400);
+      }
       return await sequelize.transaction(async (t) => {
-        const param = req.body;
-        const { lesson_id } = req.params;
-        const { error } = await validateAddExerciseInput({
-          ...param,
-          lesson_id,
-        });
-        if (error) {
-          handleError(error.message, 400);
-        }
-
         const exercise = await ExerciseService.insertExercise(param, {
           transaction: t,
         });
@@ -50,12 +49,11 @@ export default {
             transaction: t,
           });
         }
-
         const lesson = await LessonService.fetchLesson({
           where: { id: lesson_id },
         });
         if (!lesson) {
-          return handleError("lesson does not exist", 403);
+          return handleError("error with exercise r/n", 403);
         }
         await lesson.$add("exercise", exercise, { transaction: t });
 
@@ -113,46 +111,46 @@ export default {
 
   completeExercise: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { exercise_id } = req.params;
+      const { type, input } = req.body;
+      const { error } = completeExerciseSchema.validate({
+        ...req.body,
+        ...req.params,
+      });
+
+      if (error) {
+        handleError(error.message, 400);
+      }
+
+      const user = await getLoggedUser(req);
+      if (!user) {
+        return handleError("user not found", 404);
+      }
+      const exercise = await ExerciseService.fetchExercise({
+        where: { id: exercise_id },
+      });
+      if (!exercise) {
+        return handleError("exercise not found", 404);
+      }
+      const step_validation = await exercise.$get("step_validation");
+      if (!step_validation) {
+        return handleError("Step validation not found", 404);
+      }
+      if (step_validation.type.toLowerCase().trim() !== "info") {
+        if (
+          step_validation.type.toLowerCase().trim() !==
+            type.toLowerCase().trim() ||
+          step_validation.input.toLowerCase().trim() !==
+            input.toLowerCase().trim()
+        ) {
+          handleError(step_validation.error_message, 403);
+        }
+      }
+      const lesson = await exercise?.$get("lesson");
+      const lesson_user = await lesson?.$get("lesson_users", {
+        where: { userId: user.id },
+      });
       return await sequelize.transaction(async (t) => {
-        const { exercise_id } = req.params;
-        const { type, input } = req.body;
-        const { error } = completeExerciseSchema.validate({
-          ...req.body,
-          ...req.params,
-        });
-
-        if (error) {
-          handleError(error.message, 400);
-        }
-
-        const user = await getLoggedUser(req);
-        if (!user) {
-          return handleError("user not found", 404);
-        }
-        const exercise = await ExerciseService.fetchExercise({
-          where: { id: exercise_id },
-        });
-        if (!exercise) {
-          return handleError("exercise not found", 404);
-        }
-        const step_validation = await exercise.$get("step_validation");
-        if (!step_validation) {
-          return handleError("Step validation not found", 404);
-        }
-        if (step_validation.type.toLowerCase().trim() !== "info") {
-          if (
-            step_validation.type.toLowerCase().trim() !==
-              type.toLowerCase().trim() ||
-            step_validation.input.toLowerCase().trim() !==
-              input.toLowerCase().trim()
-          ) {
-            handleError(step_validation.error_message, 403);
-          }
-        }
-        const lesson = await exercise?.$get("lesson");
-        const lesson_user = await lesson?.$get("lesson_users", {
-          where: { userId: user.id },
-        });
         await ExerciseService.completeExercise(user.id, exercise_id, {
           transaction: t,
         });

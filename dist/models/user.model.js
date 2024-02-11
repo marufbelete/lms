@@ -50,8 +50,8 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
         unique: {
-            name: 'email',
-            msg: "email alrady taken"
+            name: "email",
+            msg: "email alrady taken",
         },
     }),
     __metadata("design:type", Object)
@@ -60,9 +60,9 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
         unique: {
-            name: 'username',
+            name: "username",
             msg: "username already taken.",
-        }
+        },
     }),
     __metadata("design:type", Object)
 ], User.prototype, "username", void 0);
@@ -147,20 +147,22 @@ __decorate([
 exports.User = User = __decorate([
     (0, sequelize_typescript_1.Scopes)(() => ({
         user_role_state: {
-            include: [{
+            include: [
+                {
                     model: role_model_1.Role,
-                    through: { attributes: ['is_active'] }
-                }]
+                    through: { attributes: ["is_active"] },
+                },
+            ],
         },
         local_auth_user: {
             where: {
-                is_local_auth: true
-            }
-        }
+                is_local_auth: true,
+            },
+        },
     })),
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.USER,
-        modelName: 'user'
+        modelName: "user",
     })
 ], User);
 //# sourceMappingURL=user.model.js.map

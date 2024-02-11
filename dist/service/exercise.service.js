@@ -129,10 +129,12 @@ class ExerciseService {
                             {
                                 model: exercise_user_model_1.Exercise_User,
                                 attributes: ["is_completed"],
-                                include: [{
+                                include: [
+                                    {
                                         model: exercise_model_1.Exercise,
                                         attributes: ["id", "title"],
-                                    }],
+                                    },
+                                ],
                             },
                         ],
                     },

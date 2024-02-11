@@ -33,9 +33,11 @@ exports.default = {
     getCollections: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const filter = {
-                include: [{
-                        model: course_model_1.Course
-                    }]
+                include: [
+                    {
+                        model: course_model_1.Course,
+                    },
+                ],
             };
             const result = yield index_service_1.CollectionService.fetchCollections(filter);
             const mapped_result = yield (0, common_1.mapCollectionCourseImage)(result);
@@ -51,9 +53,9 @@ exports.default = {
             const param = req.body;
             const filter = {
                 where: {
-                    id
+                    id,
                 },
-                returning: true
+                returning: true,
             };
             const { error } = collection_validation_1.updateCollectionSchema.validate(Object.assign({ id }, param));
             if (error) {
@@ -75,9 +77,11 @@ exports.default = {
             }
             const filter = {
                 where: { id },
-                include: [{
-                        model: course_model_1.Course
-                    }]
+                include: [
+                    {
+                        model: course_model_1.Course,
+                    },
+                ],
             };
             const result = yield index_service_1.CollectionService.fetchCollection(filter);
             if (!result)
@@ -98,17 +102,17 @@ exports.default = {
             }
             const filter = {
                 where: {
-                    id
-                }
+                    id,
+                },
             };
             yield index_service_1.CollectionService.removeCollection(filter);
             return res.json({
-                status: true
+                status: true,
             });
         }
         catch (error) {
             next(error);
         }
-    })
+    }),
 };
 //# sourceMappingURL=collection.controller.js.map

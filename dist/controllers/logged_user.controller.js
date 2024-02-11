@@ -27,7 +27,9 @@ const exercise_model_1 = require("../models/exercise.model");
 const exercise_user_model_1 = require("../models/exercise_user.model");
 const step_validation_model_1 = require("../models/step_validation.model");
 exports.default = {
-    updateLoggedUserProfile: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    updateLoggedUserProfile: (req, res, 
+    // <IResponse<UserResponse>, {}>,
+    next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const { error } = user_validation_1.updateUserSchema.validate(req.body);
             if (error) {
@@ -54,11 +56,7 @@ exports.default = {
                 },
             });
             user.reload();
-            return res.status(201).json({
-                data: (0, user_1.mapUserRole)(user, profile_url),
-                success: true,
-                message: "profile updated!",
-            });
+            return res.status(201).json((0, user_1.mapUserRole)(user, profile_url));
         }
         catch (err) {
             next(err);
@@ -67,11 +65,14 @@ exports.default = {
     getLoggedUserProfile: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const user = yield (0, user_1.getLoggedUser)(req);
+            let profile_url;
             if (!user) {
-                return (0, handleError_1.handleError)("user not exist!", 404);
+                return (0, handleError_1.handleError)("access forbidden", 403);
             }
-            const user_info = yield index_service_1.UserService.fetchUserById(user === null || user === void 0 ? void 0 : user.id);
-            return res.status(201).json(user_info);
+            if (user && (user === null || user === void 0 ? void 0 : user.avatar)) {
+                profile_url = yield (0, file_1.getImage)(user === null || user === void 0 ? void 0 : user.avatar);
+            }
+            return res.status(200).json((0, user_1.mapUserRole)(user, profile_url));
         }
         catch (err) {
             next(err);
@@ -155,9 +156,7 @@ exports.default = {
                     if (prereq_info &&
                         prereq_info.prereq &&
                         prereq_info.prereq.length > 0) {
-                        return res
-                            .status(403)
-                            .json({
+                        return res.status(403).json({
                             message: "Would you like to continue without completing the prerequisite course?",
                             data: prereq_info,
                             status: false,
@@ -184,15 +183,17 @@ exports.default = {
                 });
                 const filter = {
                     where: { id: course_id },
-                    include: [{
+                    include: [
+                        {
                             model: lesson_model_1.Lesson,
-                            as: 'lessons'
-                        }],
-                    order: [
-                        [{ model: lesson_model_1.Lesson, as: 'lessons' }, "order", "ASC"],
-                        [{ model: lesson_model_1.Lesson, as: 'lessons' }, "createdAt", "ASC"],
+                            as: "lessons",
+                        },
                     ],
-                    transaction: t
+                    order: [
+                        [{ model: lesson_model_1.Lesson, as: "lessons" }, "order", "ASC"],
+                        [{ model: lesson_model_1.Lesson, as: "lessons" }, "createdAt", "ASC"],
+                    ],
+                    transaction: t,
                 };
                 const result = yield index_service_1.CourseService.fetchCourse(filter);
                 if (!result)

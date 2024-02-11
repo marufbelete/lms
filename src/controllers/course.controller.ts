@@ -23,19 +23,18 @@ export default {
     next: NextFunction
   ) => {
     try {
+      const param = req.body;
+      const { error } = addCourseSchema.validate(param);
+      if (error) {
+        handleError(error.message, 403);
+      }
+      let cover_url: string;
+      if (req.file) {
+        const key = await saveImage(req.file, config.AWS_COURSE_FOLDER);
+        cover_url = await getImage(key);
+        param.image = key;
+      }
       return await sequelize.transaction(async (t) => {
-        const param = req.body;
-        const { error } = addCourseSchema.validate(param);
-        if (error) {
-          handleError(error.message, 403);
-        }
-        let cover_url;
-        if (req.file) {
-          const key = await saveImage(req.file, config.AWS_COURSE_FOLDER);
-          cover_url = await getImage(key);
-          param.image = key;
-        }
-
         const result = await CourseService.insertCourse(param, {
           transaction: t,
         });
@@ -170,37 +169,41 @@ export default {
     next: NextFunction
   ) => {
     try {
+      const { id } = req.params;
+      const param = req.body;
+      const { error } = updateCourseSchema.validate({
+        id,
+        ...param,
+      });
+      if (error) {
+        handleError(error.message, 403);
+      }
+      let cover_url: string;
+      const course = await CourseService.fetchCourse({
+        where: {
+          id,
+        },
+      });
+      if (!course) {
+        return handleError("course not found", 404);
+      }
+      let key = course.image;
+      if (req.file) {
+        key = await saveImage(req.file, config.AWS_COURSE_FOLDER);
+        course.image && (await removeImage(course.image));
+        param.image = key;
+      }
+      if (key) {
+        cover_url = await getImage(key);
+      }
+
       return await sequelize.transaction(async (t) => {
-        const { id } = req.params;
-        const param = req.body;
         const filter: UpdateOptions = {
           where: {
             id,
           },
           transaction: t,
-          returning: true,
         };
-        const { error } = updateCourseSchema.validate({
-          id,
-          ...param,
-        });
-        if (error) {
-          handleError(error.message, 403);
-        }
-        let cover_url;
-        const course = await CourseService.fetchCourse(filter);
-        if (!course) {
-          return handleError("course not found", 404);
-        }
-        let key = course.image;
-        if (req.file) {
-          key = await saveImage(req.file, config.AWS_COURSE_FOLDER);
-          course.image && (await removeImage(course.image));
-          param.image = key;
-        }
-        if (key) {
-          cover_url = await getImage(key);
-        }
 
         await CourseService.editCourse(param, filter);
         if (param.prerequisiteIds && param?.prerequisiteIds?.length > 0) {
@@ -216,7 +219,6 @@ export default {
             transaction: t,
           });
         }
-
         await course.reload({ transaction: t });
         course.dataValues.cover_url = cover_url;
         return res.status(201).json(course);

@@ -38,19 +38,30 @@ exports.default = {
                     cover_url = yield (0, file_1.getImage)(key);
                     param.image = key;
                 }
-                const result = yield index_service_1.CourseService.insertCourse(param, { transaction: t });
+                const result = yield index_service_1.CourseService.insertCourse(param, {
+                    transaction: t,
+                });
                 if (param.prerequisiteIds && param.prerequisiteIds.length > 0) {
-                    const prerequisite_info = param.prerequisiteIds
-                        .map(id => ({ requisiteId: result.id, prereqId: id }));
-                    yield index_service_1.CourseService.insertBulkPrerequisite(prerequisite_info, { transaction: t });
-                    yield result.reload({ include: [{
+                    const prerequisite_info = param.prerequisiteIds.map((id) => ({
+                        requisiteId: result.id,
+                        prereqId: id,
+                    }));
+                    yield index_service_1.CourseService.insertBulkPrerequisite(prerequisite_info, {
+                        transaction: t,
+                    });
+                    yield result.reload({
+                        include: [
+                            {
                                 model: course_model_1.Course,
-                                as: 'prereq',
+                                as: "prereq",
                                 through: {
-                                    attributes: []
+                                    attributes: [],
                                 },
-                                attributes: ['id', 'title', 'description']
-                            }], transaction: t });
+                                attributes: ["id", "title", "description"],
+                            },
+                        ],
+                        transaction: t,
+                    });
                 }
                 result.dataValues.cover_url = cover_url;
                 return res.status(201).json(result);
@@ -64,26 +75,31 @@ exports.default = {
         try {
             const { lesson, page, pageSize } = req.query;
             const filter = {
-                include: [{
+                include: [
+                    {
                         model: course_model_1.Course,
-                        as: 'prereq',
+                        as: "prereq",
                         through: {
-                            attributes: []
+                            attributes: [],
                         },
-                        attributes: ['id', 'title', 'description']
-                    }]
+                        attributes: ["id", "title", "description"],
+                    },
+                ],
             };
             if (lesson) {
                 filter.order = [
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "order", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "createdAt", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "order", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "createdAt", "ASC"],
                 ];
                 filter.include.push({
                     model: lesson_model_1.Lesson,
-                    as: 'lessons'
+                    as: "lessons",
                 });
             }
-            const result = yield index_service_1.CourseService.fetchCourses((0, common_1.paginate)(filter, { page: Number(page) || 1, pageSize: Number(pageSize) || 9 }));
+            const result = yield index_service_1.CourseService.fetchCourses((0, common_1.paginate)(filter, {
+                page: Number(page) || 1,
+                pageSize: Number(pageSize) || 9,
+            }));
             const mapped_result = yield (0, common_1.mapCourseImage)(result);
             return res.json(mapped_result);
         }
@@ -97,31 +113,46 @@ exports.default = {
             const filter = {
                 attributes: ["id", "title", "description", "image"],
                 order: [
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "order", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "createdAt", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, { model: exercise_model_1.Exercise, as: 'exercises' }, "order", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, { model: exercise_model_1.Exercise, as: 'exercises' }, "createdAt", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "order", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "createdAt", "ASC"],
+                    [
+                        { model: lesson_model_1.Lesson, as: "lessons" },
+                        { model: exercise_model_1.Exercise, as: "exercises" },
+                        "order",
+                        "ASC",
+                    ],
+                    [
+                        { model: lesson_model_1.Lesson, as: "lessons" },
+                        { model: exercise_model_1.Exercise, as: "exercises" },
+                        "createdAt",
+                        "ASC",
+                    ],
                 ],
                 include: [
                     {
                         model: lesson_model_1.Lesson,
                         attributes: ["id", "title"],
-                        include: [{
+                        include: [
+                            {
                                 model: exercise_model_1.Exercise,
                                 attributes: ["id", "title"],
-                            }],
+                            },
+                        ],
                     },
                     {
                         model: course_model_1.Course,
-                        as: 'prereq',
+                        as: "prereq",
                         through: {
-                            attributes: []
+                            attributes: [],
                         },
-                        attributes: ['id', 'title', 'description']
-                    }
+                        attributes: ["id", "title", "description"],
+                    },
                 ],
             };
-            const result = yield index_service_1.CourseService.fetchCourses((0, common_1.paginate)(filter, { page: Number(page) || 1, pageSize: Number(pageSize) || 9 }));
+            const result = yield index_service_1.CourseService.fetchCourses((0, common_1.paginate)(filter, {
+                page: Number(page) || 1,
+                pageSize: Number(pageSize) || 9,
+            }));
             const mapped_result = yield (0, common_1.mapCourseImage)(result);
             return res.json(mapped_result);
         }
@@ -137,10 +168,10 @@ exports.default = {
                 const param = req.body;
                 const filter = {
                     where: {
-                        id
+                        id,
                     },
                     transaction: t,
-                    returning: true
+                    returning: true,
                 };
                 const { error } = course_validation_1.updateCourseSchema.validate(Object.assign({ id }, param));
                 if (error) {
@@ -162,12 +193,17 @@ exports.default = {
                 }
                 yield index_service_1.CourseService.editCourse(param, filter);
                 if (param.prerequisiteIds && ((_a = param === null || param === void 0 ? void 0 : param.prerequisiteIds) === null || _a === void 0 ? void 0 : _a.length) > 0) {
-                    const prerequisite_info = param.prerequisiteIds
-                        .map(id => ({ requisiteId: course.id, prereqId: id }));
+                    const prerequisite_info = param.prerequisiteIds.map((id) => ({
+                        requisiteId: course.id,
+                        prereqId: id,
+                    }));
                     yield index_service_1.CourseService.removePrerequisite({
-                        where: { requisiteId: course.id }, transaction: t
+                        where: { requisiteId: course.id },
+                        transaction: t,
                     });
-                    yield index_service_1.CourseService.insertBulkPrerequisite(prerequisite_info, { transaction: t });
+                    yield index_service_1.CourseService.insertBulkPrerequisite(prerequisite_info, {
+                        transaction: t,
+                    });
                 }
                 yield course.reload({ transaction: t });
                 course.dataValues.cover_url = cover_url;
@@ -188,19 +224,21 @@ exports.default = {
             }
             const filter = {
                 where: { id },
-                include: [{
+                include: [
+                    {
                         model: course_model_1.Course,
-                        as: 'prereq',
+                        as: "prereq",
                         through: {
-                            attributes: []
+                            attributes: [],
                         },
-                        attributes: ['id', 'title', 'description']
-                    }]
+                        attributes: ["id", "title", "description"],
+                    },
+                ],
             };
             if (lesson) {
                 filter.order = [
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "order", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "createdAt", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "order", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "createdAt", "ASC"],
                 ];
                 filter.include.push({
                     model: lesson_model_1.Lesson,
@@ -227,28 +265,40 @@ exports.default = {
                 where: { id },
                 attributes: ["id", "title", "description", "image"],
                 order: [
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "order", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, "createdAt", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, { model: exercise_model_1.Exercise, as: 'exercises' }, "order", "ASC"],
-                    [{ model: lesson_model_1.Lesson, as: 'lessons' }, { model: exercise_model_1.Exercise, as: 'exercises' }, "createdAt", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "order", "ASC"],
+                    [{ model: lesson_model_1.Lesson, as: "lessons" }, "createdAt", "ASC"],
+                    [
+                        { model: lesson_model_1.Lesson, as: "lessons" },
+                        { model: exercise_model_1.Exercise, as: "exercises" },
+                        "order",
+                        "ASC",
+                    ],
+                    [
+                        { model: lesson_model_1.Lesson, as: "lessons" },
+                        { model: exercise_model_1.Exercise, as: "exercises" },
+                        "createdAt",
+                        "ASC",
+                    ],
                 ],
                 include: [
                     {
                         model: lesson_model_1.Lesson,
                         attributes: ["id", "title"],
-                        include: [{
+                        include: [
+                            {
                                 model: exercise_model_1.Exercise,
                                 attributes: ["id", "title"],
-                            }],
+                            },
+                        ],
                     },
                     {
                         model: course_model_1.Course,
-                        as: 'prereq',
+                        as: "prereq",
                         through: {
-                            attributes: []
+                            attributes: [],
                         },
-                        attributes: ['id', 'title', 'description']
-                    }
+                        attributes: ["id", "title", "description"],
+                    },
                 ],
             };
             const result = yield index_service_1.CourseService.fetchCourse(filter);
@@ -280,6 +330,6 @@ exports.default = {
         catch (error) {
             next(error);
         }
-    })
+    }),
 };
 //# sourceMappingURL=course.controller.js.map

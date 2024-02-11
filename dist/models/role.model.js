@@ -37,9 +37,9 @@ __decorate([
 ], Role.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.ENUM('admin', 'student'),
+        type: sequelize_typescript_1.DataType.ENUM("admin", "student"),
         unique: true,
-        defaultValue: 'student',
+        defaultValue: "student",
         validate: {
             isUnique(value) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -58,8 +58,8 @@ __decorate([
                 if (value === null && this.age !== 10) {
                     throw new Error("name can't be null unless age is 10");
                 }
-            }
-        }
+            },
+        },
     }),
     __metadata("design:type", String)
 ], Role.prototype, "name", void 0);
@@ -74,7 +74,7 @@ __decorate([
 exports.Role = Role = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.ROLE,
-        modelName: 'role'
+        modelName: "role",
     })
     //may need for internal validation Interfae
 ], Role);

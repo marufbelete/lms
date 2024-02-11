@@ -32,13 +32,13 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false
+        allowNull: false,
     }),
     __metadata("design:type", String)
 ], Course.prototype, "title", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
+        type: sequelize_typescript_1.DataType.STRING,
     }),
     __metadata("design:type", String)
 ], Course.prototype, "description", void 0);
@@ -56,12 +56,12 @@ __decorate([
 ], Course.prototype, "estimatedTime", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.ENUM('easy', 'medium', 'difficult'),
+        type: sequelize_typescript_1.DataType.ENUM("easy", "medium", "difficult"),
         validate: {
             isIn: {
-                args: [['easy', 'medium', 'difficult']],
-                msg: "Invalid difficulty."
-            }
+                args: [["easy", "medium", "difficult"]],
+                msg: "Invalid difficulty.",
+            },
         },
     }),
     __metadata("design:type", String)
@@ -84,11 +84,11 @@ __decorate([
     __metadata("design:type", Array)
 ], Course.prototype, "lessons", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsToMany)(() => Course, () => prerequisite_model_1.Prerequisite, 'requisiteId', 'prereqId'),
+    (0, sequelize_typescript_1.BelongsToMany)(() => Course, () => prerequisite_model_1.Prerequisite, "requisiteId", "prereqId"),
     __metadata("design:type", Array)
 ], Course.prototype, "prereq", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsToMany)(() => Course, () => prerequisite_model_1.Prerequisite, 'prereqId', 'requisiteId'),
+    (0, sequelize_typescript_1.BelongsToMany)(() => Course, () => prerequisite_model_1.Prerequisite, "prereqId", "requisiteId"),
     __metadata("design:type", Array)
 ], Course.prototype, "requisite", void 0);
 __decorate([
@@ -98,7 +98,7 @@ __decorate([
 exports.Course = Course = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.COURSE,
-        modelName: 'course'
+        modelName: "course",
     })
 ], Course);
 //# sourceMappingURL=course.model.js.map

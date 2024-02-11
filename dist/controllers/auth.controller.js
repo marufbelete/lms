@@ -19,6 +19,7 @@ const email_1 = require("../constant/email");
 const user_1 = require("../helpers/user");
 const config_1 = __importDefault(require("../config/config"));
 const index_service_1 = require("../service/index.service");
+const mail_1 = require("../helpers/mail");
 const role_1 = require("../constant/role");
 const models_1 = __importDefault(require("../models"));
 const role_model_1 = require("../models/role.model");
@@ -68,13 +69,15 @@ exports.default = {
                 const user = yield index_service_1.UserService.insertUser(user_to_add, {
                     transaction: t,
                 });
-                const role_filter = role_id ? { where: { id: role_id } } : { where: { name: role_1.ROLE.STUDENT } };
+                const role_filter = role_id
+                    ? { where: { id: role_id } }
+                    : { where: { name: role_1.ROLE.STUDENT } };
                 const role = yield index_service_1.RoleService.fetchRole(role_filter);
                 if (!role) {
                     return (0, handleError_1.handleError)("role not found", 404);
                 }
                 yield user.$add("role", role, { transaction: t });
-                // await sendEmail(mailOptions);
+                yield (0, mail_1.sendEmail)(mailOptions);
                 const access_token = (0, user_1.issueToken)({ sub: user.id, email: user.email }, config_1.default.ACCESS_TOKEN_SECRET, { expiresIn: config_1.default.ACCESS_TOKEN_EXPIRES });
                 // const user_roles = await user.$get('roles',{transaction: t });
                 // console.log(user_roles)
@@ -97,19 +100,21 @@ exports.default = {
                 return res
                     .status(201)
                     .cookie("access_token", access_token, {
-                    sameSite: "none",
+                    // sameSite: "none",
                     path: "/",
                     secure: true,
                     httpOnly: true,
                 })
-                    .json({ data: (0, user_1.mapUserRole)(user, profile_url), success: true });
+                    .json((0, user_1.mapUserRole)(user, profile_url));
             }));
         }
         catch (err) {
             next(err);
         }
     }),
-    loginUser: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    loginUser: (req, 
+    // <IResponse<UserResponse>>
+    res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const param = req.body;
             const { error } = user_validation_1.loginUserSchema.validate(param);
@@ -130,12 +135,12 @@ exports.default = {
                     return res
                         .status(200)
                         .cookie("access_token", access_token, {
-                        sameSite: "none",
+                        // sameSite: "none",
                         path: "/",
                         secure: true,
                         httpOnly: true,
                     })
-                        .json({ data: (0, user_1.mapUserRole)(user, profile_url), success: true });
+                        .json((0, user_1.mapUserRole)(user, profile_url));
                 }
                 (0, handleError_1.handleError)("Username or Password Incorrect", 401);
             }
@@ -166,7 +171,7 @@ exports.default = {
             return res
                 .status(200)
                 .clearCookie("access_token", {
-                sameSite: "none",
+                // sameSite: "none",
                 path: "/",
                 secure: true,
                 httpOnly: true,
@@ -197,7 +202,7 @@ exports.default = {
                 return res
                     .status(200)
                     .cookie("access_token", access_token, {
-                    sameSite: "none",
+                    // sameSite: "none",
                     path: "/",
                     secure: true,
                     httpOnly: true,
@@ -240,7 +245,9 @@ exports.default = {
             next(err);
         }
     }),
-    authProfile: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    authProfile: (req, res, 
+    // <IResponse<UserResponse>, {}>,
+    next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const user = yield (0, user_1.getLoggedUser)(req);
             let profile_url;
@@ -250,10 +257,7 @@ exports.default = {
             if (user && (user === null || user === void 0 ? void 0 : user.avatar)) {
                 profile_url = yield (0, file_1.getImage)(user === null || user === void 0 ? void 0 : user.avatar);
             }
-            return res.status(200).json({
-                success: true,
-                data: (0, user_1.mapUserRole)(user, profile_url),
-            });
+            return res.status(200).json((0, user_1.mapUserRole)(user, profile_url));
         }
         catch (err) {
             next(err);

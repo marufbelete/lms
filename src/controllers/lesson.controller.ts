@@ -21,13 +21,13 @@ export default {
     next: NextFunction
   ) => {
     try {
+      const param = req.body;
+      const { course_id } = req.params;
+      const { error } = await validateAddLessonInput({ ...param, course_id });
+      if (error) {
+        handleError(error.message, 403);
+      }
       return await sequelize.transaction(async (t) => {
-        const param = req.body;
-        const { course_id } = req.params;
-        const { error } = await validateAddLessonInput({ ...param, course_id });
-        if (error) {
-          handleError(error.message, 403);
-        }
         const lesson = await LessonService.insertLesson(param, {
           transaction: t,
         });

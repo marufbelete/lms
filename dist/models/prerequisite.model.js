@@ -38,7 +38,7 @@ __decorate([
 exports.Prerequisite = Prerequisite = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.PREREQUISITE,
-        modelName: 'prerequisite',
+        modelName: "prerequisite",
     })
 ], Prerequisite);
 //# sourceMappingURL=prerequisite.model.js.map

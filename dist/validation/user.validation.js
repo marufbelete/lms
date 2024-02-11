@@ -21,7 +21,7 @@ exports.updateUserSchema = joi_1.default.object({
     avatar: joi_1.default.string(),
     email: joi_1.default.string().email(),
     username: joi_1.default.string(),
-    subscribed_to_newsletter: joi_1.default.string()
+    subscribed_to_newsletter: joi_1.default.string(),
 });
 exports.loginUserSchema = joi_1.default.object({
     email: joi_1.default.string().required().email(),

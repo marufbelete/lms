@@ -30,13 +30,13 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false
+        allowNull: false,
     }),
     __metadata("design:type", String)
 ], Collection.prototype, "title", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
+        type: sequelize_typescript_1.DataType.STRING,
     }),
     __metadata("design:type", String)
 ], Collection.prototype, "description", void 0);
@@ -55,7 +55,7 @@ __decorate([
 exports.Collection = Collection = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.COLLECTION,
-        modelName: 'collection',
+        modelName: "collection",
     })
 ], Collection);
 //# sourceMappingURL=collection.model.js.map

@@ -29,14 +29,14 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,
-        defaultValue: false
+        defaultValue: false,
     }),
     __metadata("design:type", String)
 ], Collection_User.prototype, "is_started", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,
-        defaultValue: false
+        defaultValue: false,
     }),
     __metadata("design:type", String)
 ], Collection_User.prototype, "is_completed", void 0);
@@ -61,7 +61,7 @@ __decorate([
 exports.Collection_User = Collection_User = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: table_1.TABLE.COLLECTION_USER,
-        modelName: 'collection_user',
+        modelName: "collection_user",
     })
 ], Collection_User);
 //# sourceMappingURL=collection_user.js.map

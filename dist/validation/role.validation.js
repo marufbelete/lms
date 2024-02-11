@@ -10,6 +10,6 @@ exports.addRoleSchema = joi_1.default.object({
 });
 exports.updateRoleSchema = joi_1.default.object({
     id: joi_1.default.any().required(),
-    name: joi_1.default.string().required()
+    name: joi_1.default.string().required(),
 });
 //# sourceMappingURL=role.validation.js.map
