@@ -68,4 +68,3 @@ exports.StepValidation = StepValidation = __decorate([
         updatedAt: "updated_at",
     })
 ], StepValidation);
-//# sourceMappingURL=step_validation.model.js.map

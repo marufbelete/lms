@@ -14,4 +14,3 @@ const S3Config = {
 };
 const s3 = new client_s3_1.S3Client(S3Config);
 exports.default = s3;
-//# sourceMappingURL=s3-config.js.map

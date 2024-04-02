@@ -45,4 +45,3 @@ exports.changePasswordSchema = joi_1.default.object({
     old_password: joi_1.default.string().required(),
     new_password: joi_1.default.string().required(),
 });
-//# sourceMappingURL=user.validation.js.map

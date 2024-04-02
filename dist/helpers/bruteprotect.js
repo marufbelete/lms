@@ -73,4 +73,3 @@ class Bouncer {
     }
 }
 exports.default = new Bouncer(300000, 900000, 5);
-//# sourceMappingURL=bruteprotect.js.map

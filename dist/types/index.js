@@ -23,4 +23,3 @@ __exportStar(require("./exercise.interface"), exports);
 __exportStar(require("./course.interface"), exports);
 __exportStar(require("./common.interface"), exports);
 __exportStar(require("./collection.interface"), exports);
-//# sourceMappingURL=index.js.map

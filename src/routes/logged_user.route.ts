@@ -1,5 +1,4 @@
 import express from "express";
-import { errorHandler } from "../middleware/errohandling.middleware";
 import { authenticateJWT } from "../middleware/auth.middleware";
 import ExerciseController from "../controllers/exercise.controller";
 import { uploadImage } from "../helpers/file";
@@ -9,69 +8,54 @@ const route = express.Router({ mergeParams: true });
 route.put(
   "/course",
   authenticateJWT,
-  Logged_userController.registerLoggedUserForCourse,
-  errorHandler
+  Logged_userController.registerLoggedUserForCourse
 );
-route.put(
-  "/course/start",
-  authenticateJWT,
-  Logged_userController.startCourse,
-  errorHandler
-);
+route.put("/course/start", authenticateJWT, Logged_userController.startCourse);
 route.get(
   "/course",
   authenticateJWT,
-  Logged_userController.getLoggedUserCoursesWithProgress,
-  errorHandler
+  Logged_userController.getLoggedUserCoursesWithProgress
 );
 route.get(
   "/course/info",
   authenticateJWT,
-  Logged_userController.getUserCoursesInfo,
-  errorHandler
+  Logged_userController.getUserCoursesInfo
 );
 route.get(
   "/course/:course_id",
   authenticateJWT,
-  Logged_userController.getLoggedUserCourseWithProgress,
-  errorHandler
+  Logged_userController.getLoggedUserCourseWithProgress
 );
 route.get(
   "/course/:course_id/info",
   authenticateJWT,
-  Logged_userController.getUserCourseInfo,
-  errorHandler
+  Logged_userController.getUserCourseInfo
 );
 route.get(
   "/lesson/:lesson_id/exercise",
   authenticateJWT,
-  Logged_userController.getUserExerciseInfo,
-  errorHandler
+  Logged_userController.getUserExerciseInfo
 );
 route.put(
   "/exercise/:exercise_id/validate",
   authenticateJWT,
-  ExerciseController.completeExercise,
-  errorHandler
+  ExerciseController.completeExercise
 );
 route.get(
   "/profile",
   authenticateJWT,
-  Logged_userController.getLoggedUserProfile,
-  errorHandler
+  Logged_userController.getLoggedUserProfile
 );
 route.put(
   "/profile",
   authenticateJWT,
   uploadImage.single("avatar"),
-  Logged_userController.updateLoggedUserProfile,
-  errorHandler
+  Logged_userController.updateLoggedUserProfile
 );
 route.get(
   "/collection",
   authenticateJWT,
-  Logged_userController.getUserCollections,
-  errorHandler
+  Logged_userController.getUserCollections
 );
 
 export default route;

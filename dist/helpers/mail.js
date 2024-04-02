@@ -11,4 +11,3 @@ const sendEmail = (mailOptions) => {
     return mail_1.default.send(mailOptions);
 };
 exports.sendEmail = sendEmail;
-//# sourceMappingURL=mail.js.map

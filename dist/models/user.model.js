@@ -165,4 +165,3 @@ exports.User = User = __decorate([
         modelName: "user",
     })
 ], User);
-//# sourceMappingURL=user.model.js.map

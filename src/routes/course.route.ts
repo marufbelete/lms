@@ -1,31 +1,14 @@
 import express from "express";
 const route = express.Router({ mergeParams: true });
-import { errorHandler } from "../middleware/errohandling.middleware";
 import { uploadImage } from "../helpers/file";
 import CourseController from "../controllers/course.controller";
 
-route.post(
-  "/",
-  uploadImage.single("image"),
-  CourseController.addCourse,
-  errorHandler
-);
-
-route.get("/", CourseController.getCourses, errorHandler);
-
-route.get("/info", CourseController.getCoursesInfo, errorHandler);
-
-route.put(
-  "/:id",
-  uploadImage.single("image"),
-  CourseController.updateCourse,
-  errorHandler
-);
-
-route.get("/:id", CourseController.getCourse, errorHandler);
-
-route.get("/:id/info", CourseController.getCourseInfo, errorHandler);
-
-route.delete("/:id", CourseController.deleteCourse, errorHandler);
+route.post("/", uploadImage.single("image"), CourseController.addCourse);
+route.get("/", CourseController.getCourses);
+route.get("/info", CourseController.getCoursesInfo);
+route.put("/:id", uploadImage.single("image"), CourseController.updateCourse);
+route.get("/:id", CourseController.getCourse);
+route.get("/:id/info", CourseController.getCourseInfo);
+route.delete("/:id", CourseController.deleteCourse);
 
 export default route;

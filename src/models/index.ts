@@ -13,10 +13,16 @@ import { Collection_User } from "./collection_user";
 import { StepValidation } from "./step_validation.model";
 import { Exercise } from "./exercise.model";
 import { Exercise_User } from "./exercise_user.model";
-
+console.log(config.DB_URL)
 const sequelize = config.DB_URL
   ? new Sequelize(config.DB_URL, {
-      logging: true,
+      logging: false,
+      // dialectOptions: {
+      //   ssl: {
+      //     require: true,
+      //     rejectUnauthorized: false,
+      //   },
+      // },
       pool: {
         max: 20,
         min: 0,
@@ -44,7 +50,13 @@ const sequelize = config.DB_URL
       dialect: config.DB_DIALECT,
       username: config.DB_USER,
       password: config.DB_PASSWORD,
-      logging: true,
+      logging: false,
+      // dialectOptions: {
+      //   ssl: {
+      //     require: true,
+      //     rejectUnauthorized: false,
+      //   },
+      // },
       models: [
         User,
         Role,
@@ -69,3 +81,4 @@ const sequelize = config.DB_URL
     });
 
 export default sequelize;
+

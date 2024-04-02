@@ -1,20 +1,14 @@
 import { Dialect } from "sequelize";
 import { Environments } from "../types";
 [
-  "DEV_DATABASE_URL",
   "DATABASE_URL",
   "PORT",
   "ACCESS_TOKEN_SECRET",
-  "LONG_ACCESS_TOKEN_EXPIRY",
   "ACCESS_TOKEN_EXPIRES",
+  "LONG_ACCESS_TOKEN_EXPIRY",
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
-  "MAIL_PORT",
   "EMAIL",
-  "MAIL_HOST",
-  "MAIL_SERVICE",
-  "MAIL_REDIRECT_URI",
-  "MAIL_REFRESH_TOKEN",
   "BASE_URL",
   "FE_URL",
   "SENDGRID_API_KEY",
@@ -23,6 +17,7 @@ import { Environments } from "../types";
   "AWS_ACCESS_KEY_ID",
   "AWS_SECRET_ACCESS_KEY",
   "AWS_PROFILE_FOLDER",
+  "AWS_COURSE_FOLDER"
 ].forEach((name) => {
   if (!process.env[name]) {
     throw new Error(`Environment variable ${name} is missing`);

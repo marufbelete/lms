@@ -7,4 +7,3 @@ const handleError = (msg, status) => {
     throw error;
 };
 exports.handleError = handleError;
-//# sourceMappingURL=handleError.js.map

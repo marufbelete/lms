@@ -16,4 +16,3 @@
 //     next(error);
 //  }
 // };
-//# sourceMappingURL=check_admin.middleware.js.map

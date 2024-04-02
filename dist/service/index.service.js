@@ -20,4 +20,3 @@ __exportStar(require("./collection.service"), exports);
 __exportStar(require("./course.service"), exports);
 __exportStar(require("./lesson.service"), exports);
 __exportStar(require("./exercise.service"), exports);
-//# sourceMappingURL=index.service.js.map

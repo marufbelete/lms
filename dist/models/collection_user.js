@@ -64,4 +64,3 @@ exports.Collection_User = Collection_User = __decorate([
         modelName: "collection_user",
     })
 ], Collection_User);
-//# sourceMappingURL=collection_user.js.map

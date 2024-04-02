@@ -87,4 +87,3 @@ exports.Lesson = Lesson = __decorate([
         modelName: "lesson",
     })
 ], Lesson);
-//# sourceMappingURL=lesson.model.js.map

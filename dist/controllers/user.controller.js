@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -23,7 +14,7 @@ const lesson_user_model_1 = require("../models/lesson_user.model");
 const common_1 = require("../helpers/common");
 const exercise_user_model_1 = require("../models/exercise_user.model");
 exports.default = {
-    addRoleToUser: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    addRoleToUser: async (req, res, next) => {
         try {
             const { id: user_id } = req.params;
             const { role_id } = req.body;
@@ -34,19 +25,19 @@ exports.default = {
             if (error) {
                 (0, handleError_1.handleError)(error.message, 403);
             }
-            const user = yield index_service_1.UserService.fetchUserById(user_id);
+            const user = await index_service_1.UserService.fetchUserById(user_id);
             if (!user) {
                 return (0, handleError_1.handleError)("user does not exist", 404);
             }
-            const existing_user_roles = yield (user === null || user === void 0 ? void 0 : user.$get("roles"));
+            const existing_user_roles = await (user === null || user === void 0 ? void 0 : user.$get("roles"));
             if (existing_user_roles === null || existing_user_roles === void 0 ? void 0 : existing_user_roles.find((e) => e.id === role_id)) {
                 return (0, handleError_1.handleError)("This role already exist", 403);
             }
-            const role = yield index_service_1.RoleService.fetchRole({ where: { id: role_id } });
+            const role = await index_service_1.RoleService.fetchRole({ where: { id: role_id } });
             if (!role) {
                 return (0, handleError_1.handleError)("role not found", 404);
             }
-            yield (user === null || user === void 0 ? void 0 : user.$add("role", role));
+            await (user === null || user === void 0 ? void 0 : user.$add("role", role));
             return res.status(201).json({
                 success: true,
                 message: "role added successfully",
@@ -55,8 +46,8 @@ exports.default = {
         catch (err) {
             next(err);
         }
-    }),
-    deleteRoleFromUser: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    },
+    deleteRoleFromUser: async (req, res, next) => {
         try {
             const { id: user_id, role_id } = req.params;
             const { error } = user_validation_1.roleToUserSchema.validate({
@@ -66,17 +57,17 @@ exports.default = {
             if (error) {
                 (0, handleError_1.handleError)(error.message, 403);
             }
-            const user = yield index_service_1.UserService.fetchUserById(user_id);
+            const user = await index_service_1.UserService.fetchUserById(user_id);
             if (!user) {
                 (0, handleError_1.handleError)("user does not exist", 403);
             }
-            const existing_user_roles = yield (user === null || user === void 0 ? void 0 : user.$get("roles"));
+            const existing_user_roles = await (user === null || user === void 0 ? void 0 : user.$get("roles"));
             if (existing_user_roles === null || existing_user_roles === void 0 ? void 0 : existing_user_roles.find((e) => e.id === role_id)) {
-                const role = yield index_service_1.RoleService.fetchRole({ where: { id: role_id } });
+                const role = await index_service_1.RoleService.fetchRole({ where: { id: role_id } });
                 if (!role) {
                     return (0, handleError_1.handleError)("role not found", 404);
                 }
-                yield (user === null || user === void 0 ? void 0 : user.$remove("role", role));
+                await (user === null || user === void 0 ? void 0 : user.$remove("role", role));
                 return res.status(201).json({
                     success: true,
                     message: "role removed successfully",
@@ -87,71 +78,71 @@ exports.default = {
         catch (err) {
             next(err);
         }
-    }),
-    registerUserForCourse: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    },
+    registerUserForCourse: async (req, res, next) => {
         try {
-            return yield models_1.default.transaction((t) => __awaiter(void 0, void 0, void 0, function* () {
-                const { id: user_id } = req.params;
-                const { course_id } = req.body;
-                const { error } = user_validation_1.courseToUserSchema.validate({
-                    user_id,
-                    course_id,
-                });
-                if (error) {
-                    (0, handleError_1.handleError)(error.message, 403);
-                }
-                const user = yield index_service_1.UserService.fetchUserById(user_id);
-                if (!user) {
-                    return (0, handleError_1.handleError)("user does not exist", 403);
-                }
-                const existing_user_courses = yield (user === null || user === void 0 ? void 0 : user.$get("courses"));
-                if (existing_user_courses === null || existing_user_courses === void 0 ? void 0 : existing_user_courses.find((e) => e.id === course_id)) {
-                    (0, handleError_1.handleError)("This user already registerd for the course", 403);
-                }
-                const course = yield index_service_1.CourseService.fetchCourse({
-                    where: { id: course_id },
-                    include: [
-                        {
-                            model: lesson_model_1.Lesson,
-                            include: [
-                                {
-                                    model: lesson_user_model_1.Lesson_User,
-                                },
-                                {
-                                    model: exercise_model_1.Exercise,
-                                },
-                            ],
-                        },
-                    ],
-                });
-                if (!course) {
-                    return (0, handleError_1.handleError)("Course not exist", 403);
-                }
-                const leastOrderLesson = yield index_service_1.LessonService.fetchLesson({
-                    where: { courseId: course_id },
-                    order: [
-                        ["order", "ASC"],
-                        ["createdAt", "ASC"],
-                    ],
-                });
-                if (!leastOrderLesson) {
-                    return (0, handleError_1.handleError)("lesson to start not found", 404);
-                }
-                const [course_user] = (yield user.$add("course", course, {
+            const { id: user_id } = req.params;
+            const { course_id } = req.body;
+            const { error } = user_validation_1.courseToUserSchema.validate({
+                user_id,
+                course_id,
+            });
+            if (error) {
+                (0, handleError_1.handleError)(error.message, 403);
+            }
+            const user = await index_service_1.UserService.fetchUserById(user_id);
+            if (!user) {
+                return (0, handleError_1.handleError)("user does not exist", 403);
+            }
+            const existing_user_courses = await (user === null || user === void 0 ? void 0 : user.$get("courses"));
+            if (existing_user_courses === null || existing_user_courses === void 0 ? void 0 : existing_user_courses.find((e) => e.id === course_id)) {
+                (0, handleError_1.handleError)("This user already registerd for the course", 403);
+            }
+            const course = await index_service_1.CourseService.fetchCourse({
+                where: { id: course_id },
+                include: [
+                    {
+                        model: lesson_model_1.Lesson,
+                        include: [
+                            {
+                                model: lesson_user_model_1.Lesson_User,
+                            },
+                            {
+                                model: exercise_model_1.Exercise,
+                            },
+                        ],
+                    },
+                ],
+            });
+            if (!course) {
+                return (0, handleError_1.handleError)("Course not exist", 403);
+            }
+            const leastOrderLesson = await index_service_1.LessonService.fetchLesson({
+                where: { courseId: course_id },
+                order: [
+                    ["order", "ASC"],
+                    ["createdAt", "ASC"],
+                ],
+            });
+            if (!leastOrderLesson) {
+                return (0, handleError_1.handleError)("lesson to start not found", 404);
+            }
+            return await models_1.default.transaction(async (t) => {
+                const [course_user] = (await user.$add("course", course, {
                     through: { currentLessonId: leastOrderLesson.id },
                     transaction: t,
                 }));
-                const lesson_users = (yield user.$add("lessons", course.lessons, {
+                const lesson_users = (await user.$add("lessons", course.lessons, {
                     through: { courseUserId: course_user.id },
                     transaction: t,
                 }));
-                yield index_service_1.LessonService.editLessonUser({ is_started: true }, {
+                await index_service_1.LessonService.editLessonUser({ is_started: true }, {
                     where: { lessonId: leastOrderLesson.id, userId: user_id },
                     transaction: t,
                 });
                 for (let lesson of (course === null || course === void 0 ? void 0 : course.lessons) || []) {
                     let lesson_user = lesson_users === null || lesson_users === void 0 ? void 0 : lesson_users.find((e) => e.lessonId === lesson.id);
-                    yield user.$add("exercises", lesson === null || lesson === void 0 ? void 0 : lesson.exercises, {
+                    await user.$add("exercises", lesson === null || lesson === void 0 ? void 0 : lesson.exercises, {
                         through: { lessonUserId: lesson_user === null || lesson_user === void 0 ? void 0 : lesson_user.id },
                         transaction: t,
                     });
@@ -160,13 +151,13 @@ exports.default = {
                     success: true,
                     message: "You are registerd for the course successfully",
                 });
-            }));
+            });
         }
         catch (err) {
             next(err);
         }
-    }),
-    getUserCoursesWithProgress: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    },
+    getUserCoursesWithProgress: async (req, res, next) => {
         try {
             const { id } = req.params;
             const { error } = common_validation_1.getByIdSchema.validate({
@@ -175,11 +166,11 @@ exports.default = {
             if (error) {
                 (0, handleError_1.handleError)(error.message, 403);
             }
-            const user = yield index_service_1.UserService.fetchUserById(id);
+            const user = await index_service_1.UserService.fetchUserById(id);
             if (!user) {
                 (0, handleError_1.handleError)("user does not exist", 403);
             }
-            const user_courses = yield index_service_1.ExerciseService.getCoursesWithProgress({
+            const user_courses = await index_service_1.ExerciseService.getCoursesWithProgress({
                 where: { userId: id },
             });
             return res.json(user_courses);
@@ -187,8 +178,8 @@ exports.default = {
         catch (err) {
             next(err);
         }
-    }),
-    getUserCoursesInfo: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    },
+    getUserCoursesInfo: async (req, res, next) => {
         try {
             const { id } = req.params;
             const { error } = common_validation_1.getByIdSchema.validate({
@@ -197,11 +188,11 @@ exports.default = {
             if (error) {
                 (0, handleError_1.handleError)(error.message, 403);
             }
-            const user = yield index_service_1.UserService.fetchUserById(id);
+            const user = await index_service_1.UserService.fetchUserById(id);
             if (!user) {
                 (0, handleError_1.handleError)("user does not exist", 403);
             }
-            const user_courses = yield index_service_1.ExerciseService.getCoursesInfo({
+            const user_courses = await index_service_1.ExerciseService.getCoursesInfo({
                 where: { userId: id },
                 order: [
                     [
@@ -237,8 +228,8 @@ exports.default = {
         catch (err) {
             next(err);
         }
-    }),
-    getUserCourseWithProgress: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    },
+    getUserCourseWithProgress: async (req, res, next) => {
         try {
             const { id: user_id, course_id } = req.params;
             const { error } = user_validation_1.courseToUserSchema.validate({
@@ -248,11 +239,11 @@ exports.default = {
             if (error) {
                 (0, handleError_1.handleError)(error.message, 403);
             }
-            const user = yield index_service_1.UserService.fetchUserById(user_id);
+            const user = await index_service_1.UserService.fetchUserById(user_id);
             if (!user) {
                 (0, handleError_1.handleError)("user does not exist", 403);
             }
-            const user_course = yield index_service_1.ExerciseService.getCoursesWithProgress({
+            const user_course = await index_service_1.ExerciseService.getCoursesWithProgress({
                 where: { userId: user_id, courseId: course_id },
             });
             if (user_course.length == 0) {
@@ -263,8 +254,8 @@ exports.default = {
         catch (err) {
             next(err);
         }
-    }),
-    getUserCourseInfo: (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    },
+    getUserCourseInfo: async (req, res, next) => {
         try {
             const { id: user_id, course_id } = req.params;
             const { error } = user_validation_1.courseToUserSchema.validate({
@@ -274,11 +265,11 @@ exports.default = {
             if (error) {
                 (0, handleError_1.handleError)(error.message, 403);
             }
-            const user = yield index_service_1.UserService.fetchUserById(user_id);
+            const user = await index_service_1.UserService.fetchUserById(user_id);
             if (!user) {
                 (0, handleError_1.handleError)("user does not exist", 403);
             }
-            const user_courses = yield index_service_1.ExerciseService.getCoursesInfo({
+            const user_courses = await index_service_1.ExerciseService.getCoursesInfo({
                 where: { userId: user_id, courseId: course_id },
                 order: [
                     [
@@ -318,6 +309,5 @@ exports.default = {
         catch (err) {
             next(err);
         }
-    }),
+    },
 };
-//# sourceMappingURL=user.controller.js.map

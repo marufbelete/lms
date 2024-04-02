@@ -24,4 +24,3 @@ exports.updateCourseSchema = joi_1.default.object({
     collectionId: joi_1.default.string(),
     prerequisiteIds: joi_1.default.array(),
 });
-//# sourceMappingURL=course.validation.js.map

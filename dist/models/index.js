@@ -18,9 +18,16 @@ const collection_user_1 = require("./collection_user");
 const step_validation_model_1 = require("./step_validation.model");
 const exercise_model_1 = require("./exercise.model");
 const exercise_user_model_1 = require("./exercise_user.model");
+console.log(config_1.default.DB_URL);
 const sequelize = config_1.default.DB_URL
     ? new sequelize_typescript_1.Sequelize(config_1.default.DB_URL, {
-        logging: true,
+        logging: false,
+        // dialectOptions: {
+        //   ssl: {
+        //     require: true,
+        //     rejectUnauthorized: false,
+        //   },
+        // },
         pool: {
             max: 20,
             min: 0,
@@ -48,7 +55,13 @@ const sequelize = config_1.default.DB_URL
         dialect: config_1.default.DB_DIALECT,
         username: config_1.default.DB_USER,
         password: config_1.default.DB_PASSWORD,
-        logging: true,
+        logging: false,
+        // dialectOptions: {
+        //   ssl: {
+        //     require: true,
+        //     rejectUnauthorized: false,
+        //   },
+        // },
         models: [
             user_model_1.User,
             role_model_1.Role,
@@ -72,4 +85,3 @@ const sequelize = config_1.default.DB_URL
         },
     });
 exports.default = sequelize;
-//# sourceMappingURL=index.js.map

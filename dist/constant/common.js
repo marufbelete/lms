@@ -4,4 +4,3 @@ exports.WEIGHT = void 0;
 exports.WEIGHT = {
     MAX: 100,
 };
-//# sourceMappingURL=common.js.map

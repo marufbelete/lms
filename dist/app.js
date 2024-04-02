@@ -11,6 +11,7 @@ const index_1 = __importDefault(require("./routes/index"));
 const cors_1 = __importDefault(require("cors"));
 const passport_1 = __importDefault(require("./auth/passport"));
 const server_1 = __importDefault(require("./config/server"));
+const errohandling_middleware_1 = require("./middleware/errohandling.middleware");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: [
@@ -27,6 +28,6 @@ app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
 app.use(express_1.default.static("public"));
 app.use("/api", index_1.default);
+app.use(errohandling_middleware_1.errorHandler);
 (0, server_1.default)(app);
 exports.default = app;
-//# sourceMappingURL=app.js.map

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.paginate = exports.mapCourseCompleted = exports.mapCollectionCourseImage = exports.mapCourseImage = exports.mapCourseUserInfo = exports.exerciseMaxWeightUpdateFilter = exports.exerciseMaxWeightFilter = exports.lessonMaxWeightUpdateFilter = exports.lessonMaxWeightFilter = exports.mapUserExerciseInfo = exports.isAllCompleted = exports.calculateCompletedExerciseWeight = void 0;
 const sequelize_1 = require("sequelize");
@@ -131,27 +122,27 @@ const mapCourseUserInfo = (inputData) => {
     return transformedData;
 };
 exports.mapCourseUserInfo = mapCourseUserInfo;
-const mapCourseImage = (courses) => __awaiter(void 0, void 0, void 0, function* () {
+const mapCourseImage = async (courses) => {
     for (let course of courses) {
         if (course.image) {
-            const url = yield (0, file_1.getImage)(course.image);
+            const url = await (0, file_1.getImage)(course.image);
             course.dataValues.cover_url = url;
         }
     }
     return courses;
-});
+};
 exports.mapCourseImage = mapCourseImage;
-const mapCollectionCourseImage = (collections) => __awaiter(void 0, void 0, void 0, function* () {
+const mapCollectionCourseImage = async (collections) => {
     for (let collection of collections) {
         for (let course of collection.courses) {
             if (course.image) {
-                const url = yield (0, file_1.getImage)(course.image);
+                const url = await (0, file_1.getImage)(course.image);
                 course.dataValues.cover_url = url;
             }
         }
     }
     return collections;
-});
+};
 exports.mapCollectionCourseImage = mapCollectionCourseImage;
 const mapCourseCompleted = (prereq) => {
     const mapped_course = prereq.map((course) => ({
@@ -169,8 +160,10 @@ const paginate = (filter, { page, pageSize }) => {
     }
     const offset = (page - 1) * pageSize;
     const limit = pageSize;
-    return Object.assign(Object.assign({}, filter), { offset,
-        limit });
+    return {
+        ...filter,
+        offset,
+        limit,
+    };
 };
 exports.paginate = paginate;
-//# sourceMappingURL=common.js.map

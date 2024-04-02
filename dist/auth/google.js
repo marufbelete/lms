@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -26,41 +17,39 @@ const googleStrategy = new GoogleStrategy({
     clientID: config_1.default.GOOGLE_CLIENT_ID,
     clientSecret: config_1.default.GOOGLE_CLIENT_SECRET,
     callbackURL: `${config_1.default.BASE_URL}/auth/google/callback`,
-}, function (accessToken, refreshToken, profile, done) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const userInfo = {
-                first_name: profile._json.given_name,
-                last_name: profile._json.family_name,
-                google_id: profile._json.sub,
-                is_email_confirmed: profile._json.email_verified === "true" ? true : false,
-            };
-            const [user, created] = yield user_model_1.User.findOrCreate({
+}, async function (accessToken, refreshToken, profile, done) {
+    try {
+        const userInfo = {
+            first_name: profile._json.given_name,
+            last_name: profile._json.family_name,
+            google_id: profile._json.sub,
+            is_email_confirmed: profile._json.email_verified === "true" ? true : false,
+        };
+        const [user, created] = await user_model_1.User.findOrCreate({
+            where: {
+                [sequelize_1.Op.or]: [{ google_id: userInfo.google_id }],
+            },
+            defaults: userInfo,
+        });
+        if (created) {
+            const role = await index_service_1.RoleService.fetchRole({
                 where: {
-                    [sequelize_1.Op.or]: [{ google_id: userInfo.google_id }],
+                    name: role_1.ROLE.STUDENT,
                 },
-                defaults: userInfo,
             });
-            if (created) {
-                const role = yield index_service_1.RoleService.fetchRole({
-                    where: {
-                        name: role_1.ROLE.STUDENT,
-                    },
-                });
-                if (!role) {
-                    return (0, handleError_1.handleError)("default role found", 404);
-                }
-                yield user.$add("role", role);
+            if (!role) {
+                return (0, handleError_1.handleError)("default role found", 404);
             }
-            done(null, user);
+            await user.$add("role", role);
         }
-        catch (err) {
-            done(err, undefined);
-        }
-    });
+        done(null, user);
+    }
+    catch (err) {
+        done(err, undefined);
+    }
 });
 exports.googleStrategy = googleStrategy;
-const issueGoogleToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const issueGoogleToken = async (req, res, next) => {
     try {
         const user = req.user;
         const access_token = (0, user_1.issueToken)({ sub: user.id, email: user.email }, config_1.default.ACCESS_TOKEN_SECRET, { expiresIn: config_1.default.ACCESS_TOKEN_EXPIRES });
@@ -76,6 +65,5 @@ const issueGoogleToken = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     catch (err) {
         next(err);
     }
-});
+};
 exports.issueGoogleToken = issueGoogleToken;
-//# sourceMappingURL=google.js.map

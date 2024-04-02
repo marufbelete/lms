@@ -16,4 +16,3 @@ exports.TABLE = {
     COLLECTION_USER: 'collection_users',
     PREREQUISITE: 'prerequisites'
 };
-//# sourceMappingURL=table.js.map

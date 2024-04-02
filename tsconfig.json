@@ -1,19 +1,15 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
+    // "sourceMap": true,
     "outDir": "dist",
     "strict": true,
-    "lib": [
-      "ES2016"
-    ],
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es6",
+    "target": "ES2018",
     "module": "CommonJS",
     // "strictNullChecks":true,
-    "moduleResolution": "Node",
   //   "typeRoots": [
   //     "./typing-stubs",
   //     "./node_modules/@types"

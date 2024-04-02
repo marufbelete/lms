@@ -57,4 +57,3 @@ exports.User_Role = User_Role = __decorate([
         modelName: "user_role",
     })
 ], User_Role);
-//# sourceMappingURL=user_role.model.js.map

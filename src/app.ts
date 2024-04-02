@@ -6,6 +6,7 @@ import api_route from "./routes/index";
 import cors from "cors";
 import passport from "./auth/passport";
 import Server from "./config/server";
+import { errorHandler } from "./middleware/errohandling.middleware";
 const app: Application = express();
 
 app.use(
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/api", api_route);
+app.use(errorHandler)
 
 Server(app);
 

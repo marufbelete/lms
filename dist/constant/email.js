@@ -25,4 +25,3 @@ const accountConfirmationEmail = (email, name, token) => {
     return mailOptions;
 };
 exports.accountConfirmationEmail = accountConfirmationEmail;
-//# sourceMappingURL=email.js.map

@@ -14,4 +14,3 @@ exports.updateCollectionSchema = joi_1.default.object({
     title: joi_1.default.string().required(),
     description: joi_1.default.any(),
 });
-//# sourceMappingURL=collection.validation.js.map

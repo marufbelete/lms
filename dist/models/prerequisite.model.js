@@ -41,4 +41,3 @@ exports.Prerequisite = Prerequisite = __decorate([
         modelName: "prerequisite",
     })
 ], Prerequisite);
-//# sourceMappingURL=prerequisite.model.js.map

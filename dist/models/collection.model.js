@@ -58,4 +58,3 @@ exports.Collection = Collection = __decorate([
         modelName: "collection",
     })
 ], Collection);
-//# sourceMappingURL=collection.model.js.map

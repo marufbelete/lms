@@ -31,4 +31,3 @@ route.use(PATH.COLLECTION, collection_route_1.default);
 route.use(lesson_route_1.default);
 route.use(exercise_route_1.default);
 exports.default = route;
-//# sourceMappingURL=index.js.map

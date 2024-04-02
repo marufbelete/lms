@@ -8,4 +8,3 @@ const joi_1 = __importDefault(require("joi"));
 exports.getByIdSchema = joi_1.default.object({
     id: joi_1.default.string().required(),
 });
-//# sourceMappingURL=common.validation.js.map

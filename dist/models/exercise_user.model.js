@@ -67,4 +67,3 @@ exports.Exercise_User = Exercise_User = __decorate([
         modelName: "exercise_user",
     })
 ], Exercise_User);
-//# sourceMappingURL=exercise_user.model.js.map

@@ -6,4 +6,3 @@ const ROLE = {
     STUDENT: 'student'
 };
 exports.ROLE = ROLE;
-//# sourceMappingURL=role.js.map
